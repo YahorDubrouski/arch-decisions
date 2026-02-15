@@ -1,0 +1,26 @@
+version: '3.8'
+
+# Development override - use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Only contains overrides - base configuration is in docker-compose.yml
+
+services:
+  frontend:
+    # Override: Use development Dockerfile (Node.js + Vite dev server instead of nginx)
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    # Override: Use Vite dev server port (replaces production 3000:80)
+    ports:
+      - "5173:5173"
+    # Override: Remove read-only restriction for hot reload
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/node_modules:/app/node_modules
+    # Override: Use localhost for API URL in dev
+    environment:
+      - VITE_API_URL=http://localhost:3001
+
+  backend:
+    # Override: Use tsx watch for hot reload
+    command: npm run dev
