@@ -8,7 +8,7 @@ services:
     # Override: Use development Dockerfile (Node.js + Vite dev server instead of nginx)
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: DockerfileDev
     # Override: Use Vite dev server port (replaces production 3000:80)
     ports:
       - "5173:5173"

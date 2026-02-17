@@ -1,0 +1,28 @@
+# Frontend Dockerfile for Development
+# Uses Node.js runtime (not nginx) to run Vite dev server with hot reload
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Copy entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Expose Vite dev server port
+EXPOSE 5173
+
+# Use entrypoint script
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Start Vite dev server with hot reload
+# --host 0.0.0.0 allows access from outside container
+CMD ["npx", "vite", "--host", "0.0.0.0"]
