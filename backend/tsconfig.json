@@ -2,7 +2,9 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
-    "lib": ["ES2022"],
+    "lib": [
+      "ES2022"
+    ],
     "moduleResolution": "node",
     "rootDir": "./src",
     "outDir": "./dist",
@@ -17,16 +19,29 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-
     /* Path aliases */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/controllers/*": ["./src/controllers/*"],
-      "@/domain/*": ["./src/domain/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/services/*": [
+        "./src/services/*"
+      ],
+      "@/controllers/*": [
+        "./src/controllers/*"
+      ],
+      "@/domain/*": [
+        "./src/domain/*"
+      ]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts"
+  ]
 }

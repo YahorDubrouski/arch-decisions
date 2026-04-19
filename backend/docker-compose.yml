@@ -9,10 +9,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3001:3000"
-    environment:
-      - NODE_ENV=development
-      - PORT=3000
-      - DATABASE_PATH=./data/decisions.db
+    env_file:
+      - .env
     volumes:
       - ./src:/app/src
       - ./data:/app/data
