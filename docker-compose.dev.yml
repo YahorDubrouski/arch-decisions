@@ -11,7 +11,7 @@ services:
       dockerfile: DockerfileDev
     # Override: Use Vite dev server port (replaces production 3000:80)
     ports:
-      - "5173:5173"
+      - "5174:5173"
     # Override: Remove read-only restriction for hot reload
     volumes:
       - ./frontend/src:/app/src
