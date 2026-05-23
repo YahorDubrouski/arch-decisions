@@ -1,0 +1,14 @@
+---
+description: Robert C. Martin Clean Code naming — intention-revealing names, verbs, consistency
+alwaysApply: true
+---
+
+# Clean Code: naming
+
+- **Methods are verbs**; **classes/types are nouns**. Names should answer *what* and *why*, not *how* unless the implementation is the point.
+- **Avoid vague handlers**: prefer `handlePostDecisionsEvaluation` over `evaluate` on HTTP controllers; prefer `evaluateAll` / `findById` over generic `get` / `process` when the domain matters.
+- **Avoid noise**: drop redundant `data`, `info`, `object` unless they disambiguate. Prefer `projectContext` over `contextData`.
+- **One word per concept** across the codebase (`fetch` vs `get` vs `retrieve` — pick one for the same operation).
+- **Booleans are predicates**: `isValid`, `hasPermission`, `shouldRetry`.
+
+**Naming sanity check:** would a new teammate understand each **public** name without opening the body?

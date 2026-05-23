@@ -1,0 +1,13 @@
+---
+description: Clarity first — readable code, comments for WHY, abstraction levels, obvious HTTP mapping
+alwaysApply: true
+---
+
+# Code clarity
+
+- **Readers first**: if a name needs a comment to understand, **rename** instead.
+- **Comments explain WHY**, not what the next line does. Use them for non-obvious constraints, API quirks, security, or performance trade-offs.
+- **One level of abstraction per function**: if you can name a block with a phrase, extract a well-named private method.
+- **HTTP layer**: status codes and error shapes should be obvious from the method that sends them (e.g. `sendBadRequestForInvalidContext`).
+
+**Before finishing:** did we avoid abbreviations except industry-standard ones (`id`, `url`, `http`)? Is every comment justified by a *why* that would otherwise be lost?
