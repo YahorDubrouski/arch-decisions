@@ -1,0 +1,39 @@
+---
+description: Frontend folder layout — hybrid feature-based structure, CSS Modules, placement rules
+globs: frontend/**/*
+alwaysApply: false
+---
+
+# Frontend structure
+
+Use the **hybrid feature-based** layout (feature folders + shared layer). Match existing folders before inventing new top-level ones.
+
+## Where new code goes
+
+| Layer | Path | Put here |
+|-------|------|----------|
+| App wiring | `app/` | Router, providers, global app shell |
+| Routes | `pages/` | One screen per route; thin — compose features only |
+| Feature UI | `features/<name>/components/` | Components for one user flow + co-located `*.module.css` + `__tests__/` |
+| Feature state | `features/<name>/hooks/` | Stateful logic for that feature + `__tests__/` |
+| Feature API | `features/<name>/services/` | API calls for that feature (use `shared/api/httpClient`) |
+| Shared business | `domain/` | Cross-feature types and pure rules (no React, no fetch) |
+| Shared infra | `shared/` | `api/`, `styles/`, future generic UI kit |
+| Test setup | `test/` | Vitest setup only (jest-dom, cleanup) |
+
+## Rules
+
+- **Pages stay thin** — no business logic or direct `fetch` in `pages/`; delegate to `features/*/hooks` and `features/*/services`.
+- **Co-locate styles** — `ComponentName.module.css` next to the component or page; do not add global CSS unless it belongs in `shared/styles/` (tokens, reset).
+- **Co-locate tests** — `__tests__/` inside the feature folder, next to the code under test.
+- **New user flow** — create `features/<flow-name>/` with `components/`, `hooks/`, `services/` as needed; add a route in `app/routes.tsx` and a page in `pages/`.
+- **Avoid** top-level `components/`, `hooks/`, `services/` at `src/` root — that is the old layered layout.
+
+## Data flow
+
+`pages/` → `features/<name>/` (components + hooks) → `features/<name>/services/` or `shared/api/` → `domain/`
+
+## Styling
+
+- Global: `shared/styles/tokens.css`, `shared/styles/reset.css` (imported from `main.tsx`).
+- Scoped: `*.module.css` imported as `import styles from './X.module.css'` and `className={styles.foo}`.
