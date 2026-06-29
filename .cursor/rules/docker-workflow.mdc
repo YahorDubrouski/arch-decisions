@@ -1,0 +1,58 @@
+---
+description: Run all npm, tests, and installs inside Docker — never on the host
+alwaysApply: true
+---
+
+# Docker-first workflow
+
+All package management, tests, lint, and format commands for **frontend** and **backend** run **inside containers**, not on the host.
+
+## 1. Ensure the stack is up
+
+From the **repo root**, before any `npm` / `node` command:
+
+```bash
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml ps -q
+```
+
+If no containers are running (empty output), start them:
+
+```bash
+make docker-up
+```
+
+Wait until both `frontend` and `backend` services are up before proceeding.
+
+## 2. Run commands via Docker exec
+
+Use `docker-compose exec` (preferred — service names, not container IDs):
+
+```bash
+# Backend
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec backend npm run test
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec backend npm install
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec backend npm run lint
+
+# Frontend
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm run test
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm install
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec frontend npm run lint
+```
+
+Add `-T` when running non-interactive (CI, scripts): `exec -T backend npm run test`.
+
+Equivalent container names (if needed): `arch-decisions_backend_1`, `arch-decisions_frontend_1`.
+
+## 3. Do not run on the host
+
+- ❌ `cd frontend && npm test`
+- ❌ `cd backend && npm install`
+- ❌ `npx vitest`, `npx jest`, `npm run dev` on the host
+
+Dev servers are already started by `make docker-up` (Vite on `:5174`, API on `:3001`).
+
+## 4. Stop the stack
+
+```bash
+make docker-down
+```

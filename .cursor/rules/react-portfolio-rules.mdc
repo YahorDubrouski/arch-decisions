@@ -1,0 +1,239 @@
+---
+description: React portfolio project coding standards
+globs:
+  - "src/**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# React Portfolio Project Rules
+
+You are working on a React + TypeScript portfolio project. Generate production-quality code that demonstrates strong frontend architecture.
+
+## Core Principles
+
+- Prefer simple, readable, maintainable code over clever abstractions.
+- Use React function components only.
+- Use TypeScript everywhere.
+- Avoid `any`. If the type is unknown, model it explicitly or use `unknown` and narrow it.
+- Do not introduce abstractions before they are useful.
+- Keep components small and focused.
+- Prefer composition over inheritance or complex configuration.
+- Do not use class components, HOCs, or render props unless explicitly requested.
+
+## React State Rules
+
+Clearly separate state types:
+
+- Local UI state: `useState`
+- Server state: TanStack Query
+- Derived state: calculate during render
+- URL state: search params
+- Form state: local form state or React Hook Form for complex forms
+- Global client state: Context, Zustand, or Redux only when truly needed
+
+Do not use `useEffect` for:
+
+- derived values
+- filtering
+- sorting
+- validation derived from form fields
+- reacting to user events
+- syncing props into state
+
+Use `useEffect` only to synchronize with external systems:
+
+- `document.title`
+- `localStorage`
+- browser events
+- timers
+- WebSocket/subscriptions
+- third-party imperative APIs
+
+## Data Fetching
+
+Use TanStack Query for API GET/server state.
+
+Default architecture:
+
+```txt
+component -> feature hook -> API service -> backend
+```
+
+Example structure:
+
+```txt
+features/users/
+  components/
+  hooks/
+  services/
+  types.ts
+  UsersPage.tsx
+```
+
+Rules:
+
+- Do not fetch data inside pure UI components.
+- Do not store API data in Redux by default.
+- Include every API parameter in `queryKey`.
+- Handle `loading`, `error`, `empty`, and `success` states explicitly.
+- Use `refetch` for manual refresh actions.
+- Keep table/list components independent from the data source.
+
+## Component Design
+
+Separate:
+
+- shared UI components
+- business components
+- page/container components
+
+Use:
+
+```txt
+shared/ui/
+```
+
+only for generic UI components like:
+
+- Button
+- Modal
+- EmptyState
+- ErrorState
+- Card
+
+Use:
+
+```txt
+features/*/components/
+```
+
+for business-specific components like:
+
+- UsersTable
+- UserStatusBadge
+- ProductPrice
+- OrderStatusBadge
+
+## TypeScript Rules
+
+Always type:
+
+- component props
+- event handlers
+- API responses
+- custom hook return values
+- service function inputs/outputs
+
+Good examples:
+
+```tsx
+type UserCardProps = {
+  user: User;
+  onEdit: (userId: number) => void;
+};
+
+function UserCard({ user, onEdit }: UserCardProps) {
+  return ...
+}
+```
+
+For events:
+
+```tsx
+function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  event.preventDefault();
+}
+```
+
+For API:
+
+```tsx
+async function fetchUsers(): Promise<User[]> {
+  ...
+}
+```
+
+## Performance Rules
+
+Do not add `useMemo`, `useCallback`, or `React.memo` by default.
+
+Use them only when:
+
+- there is a measured performance issue
+- there is a large list
+- computation is expensive
+- a memoized child needs stable props
+- a third-party API depends on reference equality
+
+Prefer readable code first. Assume React Compiler may handle many safe memoization cases.
+
+## Forms
+
+For simple forms:
+
+- use controlled inputs
+- store form values in local state
+- calculate validation during render
+- handle submit in `onSubmit`
+
+Do not submit forms from `useEffect`.
+
+Use semantic HTML:
+
+```tsx
+<form onSubmit={handleSubmit}>
+  <button type="submit">Submit</button>
+</form>
+```
+
+For complex forms, prefer React Hook Form + Zod.
+
+## Accessibility
+
+Use semantic HTML first.
+
+Rules:
+
+- Use `<button>` for buttons, not clickable `<div>`.
+- Inputs must have labels.
+- Icon-only buttons need `aria-label`.
+- Modals should use `role="dialog"` and `aria-modal="true"`.
+- Form errors should use `aria-invalid` and `aria-describedby`.
+
+Accessibility should also improve testability.
+
+## Testing
+
+Use Testing Library style:
+
+- test behavior, not implementation details
+- prefer `getByRole`, `getByLabelText`, `getByText`
+- avoid testing internal state
+- avoid testing private functions
+- use `data-testid` only when accessible queries are not practical
+
+Good test mindset:
+
+```txt
+What can the user see or do?
+```
+
+Bad test mindset:
+
+```txt
+What internal state changed?
+```
+
+## Code Quality Checklist
+
+Before finalizing code, check:
+
+- Is state stored in the right place?
+- Is server state handled by TanStack Query?
+- Are derived values calculated during render?
+- Is `useEffect` really needed?
+- Are all props and API responses typed?
+- Are loading/error/empty states handled?
+- Is the component accessible?
+- Is the component easy to test?
+- Is this abstraction really needed?

@@ -4,10 +4,6 @@ import userEvent from '@testing-library/user-event';
 import {Step1TeamSize} from '../Step1TeamSize';
 import styles from '../Step1TeamSize.module.css';
 
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => vi.fn(),
-}));
-
 describe('Step1TeamSize', () => {
     it('renders team size select', () => {
         const mockOnChange = vi.fn();
@@ -39,7 +35,7 @@ describe('Step1TeamSize', () => {
         const mockOnChange = vi.fn();
         render(<Step1TeamSize value={null} onChange={mockOnChange} error="Team size is required"/>);
 
-        expect(screen.getByText('Team size is required')).toBeInTheDocument();
+        expect(screen.getByRole('alert')).toHaveTextContent('Team size is required');
     });
 
     it('applies error class when error exists', () => {
@@ -48,5 +44,6 @@ describe('Step1TeamSize', () => {
 
         const select = screen.getByLabelText(/team size/i);
         expect(select).toHaveClass(styles.selectError);
+        expect(select).toHaveAttribute('aria-invalid', 'true');
     });
 });
