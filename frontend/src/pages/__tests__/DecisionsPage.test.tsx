@@ -57,7 +57,7 @@ describe('DecisionsPage', () => {
         expect(screen.getByText(/no decisions to display yet/i)).toBeInTheDocument();
     });
 
-    it('renders recommendation summary when decisions are stored', () => {
+    it('renders decision cards when decisions are stored', () => {
         saveDecisions(sampleDecisions);
 
         render(
@@ -66,9 +66,14 @@ describe('DecisionsPage', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText(/ECS/)).toBeInTheDocument();
-        expect(screen.getByText(/AWS Secrets Manager/)).toBeInTheDocument();
-        expect(screen.getByText(/GitHub Actions/)).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Compute'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'Secrets'})).toBeInTheDocument();
+        expect(screen.getByRole('heading', {name: 'CI/CD'})).toBeInTheDocument();
+        expect(screen.getByText('ECS')).toBeInTheDocument();
+        expect(screen.getByText('AWS Secrets Manager')).toBeInTheDocument();
+        expect(screen.getByText('GitHub Actions')).toBeInTheDocument();
+        expect(screen.getByText('EC2')).toBeInTheDocument();
+        expect(screen.getAllByText('Cost').length).toBe(3);
         expect(screen.queryByText(/no decisions to display yet/i)).not.toBeInTheDocument();
     });
 

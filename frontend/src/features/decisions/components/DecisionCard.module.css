@@ -1,0 +1,56 @@
+/* ==========================================================================
+   Component: DecisionCard
+   ========================================================================== */
+
+.card {
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+}
+
+.title {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+}
+
+.section {
+    margin-bottom: var(--spacing-md);
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+.sectionLabel {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.recommended {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.alternatives {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    color: var(--color-text);
+}
+
+.alternatives li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.alternatives li:last-child {
+    margin-bottom: 0;
+}
+
+.emptyAlternatives {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}

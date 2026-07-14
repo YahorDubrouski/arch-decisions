@@ -1,0 +1,31 @@
+/* ==========================================================================
+   Component: TradeOffsGrid
+   ========================================================================== */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+}
+
+.item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+}
+
+.label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+}
+
+.value {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    text-transform: capitalize;
+}
