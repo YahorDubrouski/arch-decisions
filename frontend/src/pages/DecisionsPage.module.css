@@ -20,6 +20,22 @@
     text-align: center;
 }
 
+.summaryList {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-sm);
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.categoryLabel {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
 .actions {
     display: flex;
     gap: var(--spacing-md);

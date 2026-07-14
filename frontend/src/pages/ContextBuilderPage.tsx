@@ -8,6 +8,7 @@ import {Step3BudgetSensitivity} from '@/features/context/components/Step3BudgetS
 import {Step4ComplianceRequirements} from '@/features/context/components/Step4ComplianceRequirements';
 import {Step5OperationalMaturity} from '@/features/context/components/Step5OperationalMaturity';
 import {evaluateDecisions} from '@/features/context/services/decisionsService';
+import {saveDecisions} from '@/features/decisions/services/decisionsStorage';
 import styles from './ContextBuilderPage.module.css';
 
 export function ContextBuilderPage() {
@@ -24,7 +25,8 @@ export function ContextBuilderPage() {
         setSubmitError(null);
 
         try {
-            await evaluateDecisions(context);
+            const decisions = await evaluateDecisions(context);
+            saveDecisions(decisions);
             navigate('/decisions');
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Failed to submit context';
