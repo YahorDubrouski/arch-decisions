@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom';
 import {isContextComplete} from '@/domain/context';
 import {useContextForm} from '@/features/context/hooks/useContextForm';
 import {Step1TeamSize} from '@/features/context/components/Step1TeamSize';
+import {Step2TrafficPattern} from '@/features/context/components/Step2TrafficPattern';
 import {evaluateDecisions} from '@/features/context/services/decisionsService';
 import styles from './ContextBuilderPage.module.css';
 
@@ -38,6 +39,14 @@ export function ContextBuilderPage() {
                     value={context.teamSize ?? null}
                     onChange={(teamSize) => updateContext({teamSize})}
                     error={errors.teamSize}
+                />
+            )}
+
+            {currentStep === 2 && (
+                <Step2TrafficPattern
+                    value={context.trafficPattern ?? null}
+                    onChange={(trafficPattern) => updateContext({trafficPattern})}
+                    error={errors.trafficPattern}
                 />
             )}
 

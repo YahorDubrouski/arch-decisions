@@ -5,6 +5,8 @@ function validateStep(step: number, context: Partial<ProjectContext>): boolean {
     switch (step) {
         case 1:
             return context.teamSize !== undefined;
+        case 2:
+            return context.trafficPattern !== undefined;
         default:
             return validateContext(context);
     }

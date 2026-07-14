@@ -88,6 +88,48 @@ describe('useContextForm', () => {
         expect(result.current.errors.form).toBe('Please complete all required fields');
     });
 
+    it('moves from step 2 to step 3 when traffic pattern is filled', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({teamSize: '6-20'});
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.updateContext({trafficPattern: 'variable'});
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.currentStep).toBe(3);
+        expect(result.current.errors).toEqual({});
+    });
+
+    it('shows error on step 2 when traffic pattern is missing', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({teamSize: '6-20'});
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.currentStep).toBe(2);
+        expect(result.current.errors.form).toBe('Please complete all required fields');
+    });
+
     it('moves to previous step', () => {
         const {result} = renderHook(() => useContextForm());
 
