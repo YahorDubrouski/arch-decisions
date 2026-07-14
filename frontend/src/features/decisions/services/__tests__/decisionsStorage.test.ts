@@ -65,4 +65,10 @@ describe('decisionsStorage', () => {
 
         expect(getDecisions()).toBeNull();
     });
+
+    it('returns null when stored value does not match decisions schema', () => {
+        sessionStorage.setItem('arch-decisions:decisions', JSON.stringify({invalid: true}));
+
+        expect(getDecisions()).toBeNull();
+    });
 });

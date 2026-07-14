@@ -7,29 +7,77 @@ alwaysApply: true
 
 # React Portfolio Project Rules
 
-You are working on a React + TypeScript portfolio project. Generate production-quality code that demonstrates strong frontend architecture.
+You are working on a React + TypeScript portfolio project. Generate production-quality code that demonstrates senior-level frontend architecture.
+
+The goal of this project is not just to make the UI work, but to demonstrate strong React architecture, maintainability, scalability, accessibility, testability, and correct state ownership.
+
+---
 
 ## Core Principles
 
 - Prefer simple, readable, maintainable code over clever abstractions.
 - Use React function components only.
 - Use TypeScript everywhere.
-- Avoid `any`. If the type is unknown, model it explicitly or use `unknown` and narrow it.
+- Avoid `any`. Use explicit types, generics, or `unknown` with narrowing.
 - Do not introduce abstractions before they are useful.
 - Keep components small and focused.
 - Prefer composition over inheritance or complex configuration.
 - Do not use class components, HOCs, or render props unless explicitly requested.
+- Do not hide complexity inside “magic” custom hooks or god components.
+- Code should be production-like, not tutorial-like.
+- Prefer explicit data flow over implicit global state.
 
-## React State Rules
+---
 
-Clearly separate state types:
+## React Mental Model
 
-- Local UI state: `useState`
-- Server state: TanStack Query
-- Derived state: calculate during render
-- URL state: search params
-- Form state: local form state or React Hook Form for complex forms
-- Global client state: Context, Zustand, or Redux only when truly needed
+When generating code, follow these mental models:
+
+- Render is a snapshot.
+- Props flow down.
+- State belongs to the component that owns the change.
+- Derived values should be calculated during render.
+- Re-render is normal and not automatically a performance problem.
+- Component identity depends on component type, position in the tree, and `key`.
+- Use `key` intentionally to preserve or reset state.
+- Do not define components inside other components unless there is a strong reason.
+
+---
+
+## State Ownership Rules
+
+Always identify the type of state before choosing a tool.
+
+Use:
+
+```txt
+local UI state       -> useState
+server state         -> TanStack Query
+derived state        -> calculate during render
+URL state            -> search params
+form state           -> useState or React Hook Form
+global client state  -> Context, Zustand, or Redux only when truly needed
+mutable non-UI value -> useRef
+```
+
+Examples:
+
+```txt
+isModalOpen                  -> local UI state
+selectedTab                  -> local UI state
+users from API               -> server state
+currentUser from /me         -> server state
+search/page/sort in table    -> URL state
+email/password in login form -> form state
+isFormValid                  -> derived state
+timer id                     -> useRef
+```
+
+Do not put everything into Redux, Context, or a single global store.
+
+---
+
+## `useEffect` Rules
 
 Do not use `useEffect` for:
 
@@ -39,8 +87,11 @@ Do not use `useEffect` for:
 - validation derived from form fields
 - reacting to user events
 - syncing props into state
+- submitting forms
+- navigating after a direct user action
+- basic API GET requests when TanStack Query should be used
 
-Use `useEffect` only to synchronize with external systems:
+Use `useEffect` only to synchronize React with external systems:
 
 - `document.title`
 - `localStorage`
@@ -48,18 +99,43 @@ Use `useEffect` only to synchronize with external systems:
 - timers
 - WebSocket/subscriptions
 - third-party imperative APIs
+- manual DOM integration
 
-## Data Fetching
+Good:
+
+```tsx
+useEffect(() => {
+  document.title = title;
+}, [title]);
+```
+
+Bad:
+
+```tsx
+useEffect(() => {
+  setFullName(`${firstName} ${lastName}`);
+}, [firstName, lastName]);
+```
+
+Use this instead:
+
+```tsx
+const fullName = `${firstName} ${lastName}`;
+```
+
+---
+
+## Data Fetching Rules
 
 Use TanStack Query for API GET/server state.
 
 Default architecture:
 
 ```txt
-component -> feature hook -> API service -> backend
+page/container -> feature hook -> API service -> backend
 ```
 
-Example structure:
+Example:
 
 ```txt
 features/users/
@@ -72,20 +148,184 @@ features/users/
 
 Rules:
 
-- Do not fetch data inside pure UI components.
+- Do not fetch data inside pure UI/presentational components.
 - Do not store API data in Redux by default.
 - Include every API parameter in `queryKey`.
 - Handle `loading`, `error`, `empty`, and `success` states explicitly.
 - Use `refetch` for manual refresh actions.
 - Keep table/list components independent from the data source.
+- API service functions must have typed inputs and outputs.
+- Query hooks should have clear names like `useUsersQuery`, `useUserQuery`, `useCurrentUserQuery`.
 
-## Component Design
+Good:
 
-Separate:
+```tsx
+useQuery({
+  queryKey: ['users', { search, page, sort }],
+  queryFn: () => fetchUsers({ search, page, sort }),
+});
+```
 
-- shared UI components
-- business components
-- page/container components
+Bad:
+
+```tsx
+useQuery({
+  queryKey: ['users'],
+  queryFn: () => fetchUsers({ search, page, sort }),
+});
+```
+
+---
+
+## Mutation Rules
+
+Use TanStack Query `useMutation` for server write operations:
+
+```txt
+POST
+PUT
+PATCH
+DELETE
+```
+
+Default mutation flow:
+
+```txt
+user action
+-> mutation
+-> disable submit/action while pending
+-> onSuccess invalidate related queries
+-> show toast if useful
+-> handle errors
+```
+
+After successful mutations, invalidate related queries:
+
+```tsx
+queryClient.invalidateQueries({ queryKey: ['users'] });
+```
+
+Use optimistic updates only when:
+
+- UX benefits from immediate response
+- rollback is safe
+- business risk is low
+
+Good optimistic update candidates:
+
+```txt
+like/unlike
+checkbox toggle
+mark as read
+small status toggle
+```
+
+Bad optimistic update candidates:
+
+```txt
+payments
+orders with business-critical validation
+legal documents
+irreversible actions
+```
+
+---
+
+## API Layer Rules
+
+Do not write raw `fetch` directly inside UI components.
+
+Good structure:
+
+```txt
+features/users/
+  services/usersApi.ts
+  hooks/useUsersQuery.ts
+  hooks/useCreateUserMutation.ts
+  components/UsersTable.tsx
+  UsersPage.tsx
+```
+
+API service functions must:
+
+- be typed
+- check `response.ok`
+- throw meaningful errors
+- return typed data
+
+Example:
+
+```tsx
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+async function fetchUsers(params: FetchUsersParams): Promise<User[]> {
+  const response = await fetch('/api/users');
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch users');
+  }
+
+  return response.json();
+}
+```
+
+For runtime validation of external data, prefer Zod schemas.
+
+---
+
+## Zod / Runtime Validation Rules
+
+TypeScript only validates at development/build time. It does not validate runtime JSON.
+
+Use Zod when runtime validation matters:
+
+- form validation
+- API response validation
+- parsing unknown external data
+- enforcing shared schemas
+
+Prefer:
+
+```tsx
+const createUserSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+});
+
+type CreateUserFormValues = z.infer<typeof createUserSchema>;
+```
+
+Avoid duplicating TypeScript types and validation rules manually.
+
+Good:
+
+```txt
+Zod schema -> z.infer -> form/API usage
+```
+
+Bad:
+
+```txt
+TypeScript type in one file
+manual validation rules in component
+API assumptions elsewhere
+```
+
+---
+
+## Component Design Rules
+
+Separate components by responsibility:
+
+```txt
+page/container components      -> get data, compose screen, handle states
+business/feature components    -> know domain concepts
+shared UI components           -> generic visual building blocks
+```
 
 Use:
 
@@ -93,13 +333,19 @@ Use:
 shared/ui/
 ```
 
-only for generic UI components like:
+only for generic UI components:
 
-- Button
-- Modal
-- EmptyState
-- ErrorState
-- Card
+```txt
+Button
+Modal
+Input
+Card
+Badge
+Tooltip
+EmptyState
+ErrorState
+Skeleton
+```
 
 Use:
 
@@ -107,65 +353,98 @@ Use:
 features/*/components/
 ```
 
-for business-specific components like:
+for business-specific components:
 
-- UsersTable
-- UserStatusBadge
-- ProductPrice
-- OrderStatusBadge
+```txt
+UsersTable
+UserStatusBadge
+ProductPrice
+OrderStatusBadge
+CreateUserModal
+```
 
-## TypeScript Rules
+A component belongs in `shared` only if it can live in another project without knowing this project’s business domain.
 
-Always type:
+---
 
-- component props
-- event handlers
-- API responses
-- custom hook return values
-- service function inputs/outputs
+## Page / Feature / Shared Boundaries
 
-Good examples:
+Follow this dependency direction:
+
+```txt
+app -> pages
+pages -> features
+features -> shared
+pages -> shared
+```
+
+Avoid:
+
+```txt
+shared -> features
+shared -> business types
+shared/ui/Button -> usersApi
+```
+
+Shared code must not import feature-specific code.
+
+Recommended structure:
+
+```txt
+src/
+  app/
+    providers/
+    router/
+  pages/
+  features/
+    users/
+      components/
+      hooks/
+      services/
+      types.ts
+      UsersPage.tsx
+  shared/
+    ui/
+    lib/
+    api/
+```
+
+---
+
+## Container vs Presentational Components
+
+Prefer this flow:
+
+```txt
+UsersPage -> useUsersQuery -> UsersTable users={users}
+```
+
+Good:
 
 ```tsx
-type UserCardProps = {
-  user: User;
-  onEdit: (userId: number) => void;
-};
+function UsersPage() {
+  const { data: users = [], isLoading, isError } = useUsersQuery();
 
-function UserCard({ user, onEdit }: UserCardProps) {
-  return ...
+  if (isLoading) return <UsersSkeleton />;
+  if (isError) return <ErrorState />;
+
+  return <UsersTable users={users} />;
 }
 ```
 
-For events:
+Bad:
 
 ```tsx
-function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
-  event.preventDefault();
+function UsersTable() {
+  const { data: users = [] } = useUsersQuery();
+
+  return <table>{/* render users */}</table>;
 }
 ```
 
-For API:
+Tables, cards, and lists should receive data through props unless there is a strong reason otherwise.
 
-```tsx
-async function fetchUsers(): Promise<User[]> {
-  ...
-}
-```
-
-## Performance Rules
-
-Do not add `useMemo`, `useCallback`, or `React.memo` by default.
-
-Use them only when:
-
-- there is a measured performance issue
-- there is a large list
-- computation is expensive
-- a memoized child needs stable props
-- a third-party API depends on reference equality
-
-Prefer readable code first. Assume React Compiler may handle many safe memoization cases.
+---
 
 ## Forms
 
@@ -175,10 +454,9 @@ For simple forms:
 - store form values in local state
 - calculate validation during render
 - handle submit in `onSubmit`
+- use semantic HTML
 
-Do not submit forms from `useEffect`.
-
-Use semantic HTML:
+Good:
 
 ```tsx
 <form onSubmit={handleSubmit}>
@@ -186,9 +464,550 @@ Use semantic HTML:
 </form>
 ```
 
-For complex forms, prefer React Hook Form + Zod.
+Do not submit forms from `useEffect`.
 
-## Accessibility
+For complex forms, prefer:
+
+```txt
+React Hook Form + Zod
+```
+
+Use React Hook Form for:
+
+```txt
+many fields
+nested fields
+dynamic field arrays
+touched/dirty/errors
+complex validation
+schema validation
+```
+
+React Hook Form owns form state. TanStack Query `useMutation` sends valid data to the backend.
+
+---
+
+## URL State Rules
+
+Use URL search params for navigational state:
+
+```txt
+search
+page
+sort
+filters
+selected tab when shareable
+```
+
+Good:
+
+```txt
+/users?search=john&page=2&sort=name
+```
+
+Rules:
+
+- If state should survive refresh, consider URL state.
+- If state should be shareable, use URL state.
+- If state affects API response, include it in `queryKey`.
+- For complex filter forms, separate draft filters from applied filters.
+
+Model:
+
+```txt
+draft filters -> form/local state
+applied filters -> URL search params
+API data -> queryKey based on applied filters
+```
+
+---
+
+## Table Architecture
+
+Tables should separate:
+
+```txt
+data fetching
+URL filters/sort/page
+table rendering
+row actions
+selection state
+permissions
+```
+
+Default:
+
+```txt
+page/sort/filters -> URL state
+selected rows     -> local state
+expanded rows     -> local state
+data              -> TanStack Query
+table model       -> TanStack Table if needed
+```
+
+TanStack Query and TanStack Table are different tools:
+
+```txt
+TanStack Query -> server state
+TanStack Table -> table state/model
+```
+
+Use table libraries for complex tables. Do not build a full table engine manually unless necessary.
+
+---
+
+## Modal Rules
+
+For feature-specific modals:
+
+```txt
+shared/ui/Modal.tsx                       -> generic modal shell
+features/users/components/CreateUserModal -> business modal
+```
+
+Modal open state should usually live in the closest owner page/component.
+
+Use local state for page-only modals:
+
+```tsx
+const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+```
+
+Do not put modal open state in Redux by default.
+
+Production modal requirements:
+
+- `role="dialog"`
+- `aria-modal="true"`
+- clear title
+- close button
+- Escape handling
+- focus management
+- focus return
+- scroll lock when needed
+
+Prefer accessible primitives like Radix Dialog, Headless UI Dialog, or React Aria for complex modals.
+
+---
+
+## Toast / Notification Rules
+
+Toast is a short temporary notification. It is not state management.
+
+Use toast for:
+
+```txt
+success after mutation
+failure after mutation
+copied to clipboard
+settings saved
+```
+
+Do not use toast as the only UI for important screen states.
+
+Bad:
+
+```txt
+users failed to load -> only toast
+```
+
+Good:
+
+```txt
+users failed to load -> ErrorState with Retry
+optional toast for extra feedback
+```
+
+After successful mutation:
+
+```txt
+invalidate query
+show toast
+```
+
+Not:
+
+```txt
+show toast
+forget to update data
+```
+
+---
+
+## Auth Rules
+
+Treat `currentUser` as server state.
+
+Default:
+
+```txt
+GET /me -> useCurrentUserQuery -> currentUser
+login mutation -> invalidate ['current-user']
+logout mutation -> invalidate/remove ['current-user']
+```
+
+Do not store `currentUser` once in Redux and never verify backend again.
+
+Protected routes must handle:
+
+```txt
+loading session
+authenticated
+unauthenticated
+```
+
+Bad:
+
+```tsx
+if (!user) return <Navigate to="/login" />;
+```
+
+Good:
+
+```tsx
+if (isLoading) return <PageSkeleton />;
+if (!user) return <Navigate to="/login" />;
+
+return <Outlet />;
+```
+
+Prefer httpOnly secure cookies for auth tokens when possible.
+
+Frontend permission checks are UX only. Backend must enforce permissions.
+
+---
+
+## Permissions Rules
+
+Prefer checking permissions over hardcoded roles.
+
+Good:
+
+```tsx
+can(user, 'users:delete')
+```
+
+Bad:
+
+```tsx
+user.roles.includes('admin')
+```
+
+Roles group permissions. Permissions represent actual capabilities.
+
+Example:
+
+```tsx
+type Permission =
+  | 'users:create'
+  | 'users:delete'
+  | 'orders:refund'
+  | 'reports:view';
+
+function can(user: CurrentUser, permission: Permission): boolean {
+  return user.permissions.includes(permission);
+}
+```
+
+---
+
+## TypeScript Rules
+
+Always type:
+
+- component props
+- event handlers
+- API responses
+- service function inputs/outputs
+- custom hook return values
+- mutation inputs
+- query params
+- form values
+
+Good:
+
+```tsx
+type UserCardProps = {
+  user: User;
+  onEdit: (userId: string) => void;
+};
+
+function UserCard({ user, onEdit }: UserCardProps) {
+  return ...
+}
+```
+
+Events:
+
+```tsx
+function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  event.preventDefault();
+}
+```
+
+Input change:
+
+```tsx
+function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  setValue(event.currentTarget.value);
+}
+```
+
+Avoid:
+
+```tsx
+any
+object
+Function
+as unknown as User
+```
+
+Prefer:
+
+```tsx
+unknown + narrowing
+specific function signatures
+explicit domain types
+```
+
+---
+
+## Custom Hook Rules
+
+Custom hooks should extract reusable stateful behavior, not hide complexity.
+
+Good custom hooks:
+
+```txt
+useDisclosure
+useDebouncedValue
+useUsersQuery
+useCreateUserMutation
+useCurrentUserQuery
+useDocumentTitle
+```
+
+Do not create hooks for pure calculations.
+
+Bad:
+
+```tsx
+function useUserFullName(user: User): string {
+  return `${user.firstName} ${user.lastName}`;
+}
+```
+
+Good:
+
+```tsx
+function getUserFullName(user: User): string {
+  return `${user.firstName} ${user.lastName}`;
+}
+```
+
+Avoid god hooks:
+
+```tsx
+function useUsersPage() {
+  // fetch users
+  // filters
+  // modals
+  // delete
+  // create
+  // navigation
+  // toasts
+}
+```
+
+Split responsibilities into smaller focused hooks.
+
+---
+
+## Ref Rules
+
+Use `useRef` for:
+
+```txt
+DOM access
+focus
+scroll
+measurements
+timer ids
+mutable values that should not trigger render
+third-party imperative APIs
+```
+
+Do not use `useRef` for UI state.
+
+Bad:
+
+```tsx
+const isOpenRef = useRef(false);
+```
+
+Good:
+
+```tsx
+const [isOpen, setIsOpen] = useState(false);
+```
+
+If a value affects rendering, use state.
+
+---
+
+## Derived State Rules
+
+Do not store derived state.
+
+Bad:
+
+```tsx
+const [isValid, setIsValid] = useState(false);
+
+useEffect(() => {
+  setIsValid(email.includes('@') && password.length >= 8);
+}, [email, password]);
+```
+
+Good:
+
+```tsx
+const isValid = email.includes('@') && password.length >= 8;
+```
+
+Derived values include:
+
+```txt
+fullName
+isValid
+filteredUsers
+sortedItems
+totalPrice
+disabled state
+```
+
+Calculate during render unless the computation is genuinely expensive.
+
+---
+
+## Performance Rules
+
+Do not add `useMemo`, `useCallback`, or `React.memo` by default.
+
+Use them only when:
+
+- there is a measured performance issue
+- computation is expensive
+- list is large
+- child is memoized and needs stable props
+- third-party API depends on reference equality
+- expensive effect dependencies need stable references
+
+Prefer readable code first. Assume React Compiler may handle many safe memoization cases.
+
+Do not lazy-load tiny components.
+
+Good lazy-loading candidates:
+
+```txt
+routes/pages
+heavy charts
+maps
+rich text editors
+admin-only sections
+large rarely-opened modals
+```
+
+Bad lazy-loading candidates:
+
+```txt
+Button
+Input
+Card
+Badge
+small shared UI
+```
+
+---
+
+## Code Splitting / Suspense Rules
+
+Use `React.lazy` and `Suspense` for component/code loading, not for ordinary API loading by default.
+
+Mental model:
+
+```txt
+TanStack Query isLoading -> data is loading
+Suspense fallback        -> component/code/tree is not ready
+```
+
+Good:
+
+```tsx
+const ReportsPage = lazy(() => import('./ReportsPage'));
+
+<Suspense fallback={<ReportsSkeleton />}>
+  <ReportsPage />
+</Suspense>
+```
+
+`lazy(() => import(...))` loads JavaScript component code as a separate chunk when React first tries to render that component.
+
+---
+
+## Error Handling Rules
+
+Use explicit error states for expected API errors:
+
+```tsx
+if (isError) {
+  return <ErrorState onRetry={refetch} />;
+}
+```
+
+Use Error Boundaries for unexpected runtime errors.
+
+Do not use Error Boundary as the primary API error handling strategy.
+
+Recommended boundary placement:
+
+```txt
+app-level boundary
+route-level boundary
+widget-level boundary for unstable heavy areas
+```
+
+---
+
+## Race Conditions / Abort Rules
+
+For server state, prefer:
+
+```txt
+TanStack Query + correct queryKey
+```
+
+For manual async effects, handle stale requests:
+
+```txt
+AbortController
+cleanup
+ignore stale result flag
+```
+
+Dangerous:
+
+```tsx
+useEffect(() => {
+  fetchUsers(search).then(setUsers);
+}, [search]);
+```
+
+Because an old request may finish after a newer one and overwrite fresh data.
+
+---
+
+## Accessibility Rules
 
 Use semantic HTML first.
 
@@ -199,10 +1018,30 @@ Rules:
 - Icon-only buttons need `aria-label`.
 - Modals should use `role="dialog"` and `aria-modal="true"`.
 - Form errors should use `aria-invalid` and `aria-describedby`.
+- Use visible focus states.
+- Prefer accessible interactions over custom non-semantic elements.
 
-Accessibility should also improve testability.
+Accessibility should improve testability.
 
-## Testing
+Good:
+
+```tsx
+<button aria-label="Delete user">
+  <TrashIcon />
+</button>
+```
+
+Bad:
+
+```tsx
+<div onClick={handleDelete}>
+  <TrashIcon />
+</div>
+```
+
+---
+
+## Testing Rules
 
 Use Testing Library style:
 
@@ -224,16 +1063,154 @@ Bad test mindset:
 What internal state changed?
 ```
 
-## Code Quality Checklist
+Good:
 
-Before finalizing code, check:
+```tsx
+await user.click(screen.getByRole('button', { name: 'Create user' }));
+
+expect(
+  screen.getByRole('dialog', { name: 'Create user' })
+).toBeInTheDocument();
+```
+
+Bad:
+
+```tsx
+expect(isModalOpen).toBe(true);
+```
+
+---
+
+## Next.js / Server Component Rules
+
+If using Next.js App Router:
+
+- Components are Server Components by default.
+- Use `'use client'` only for components that need browser interactivity.
+- Keep client boundaries as small as practical.
+- Do not put server-only logic inside Client Components.
+- Server Components are good for data fetching and static UI.
+- Client Components are needed for `useState`, `useEffect`, `onClick`, browser APIs, forms, modals, dropdowns.
+
+Good split:
+
+```txt
+ProductDescription -> Server Component
+ProductReviews     -> Server Component if static/read-only
+AddToCartButton    -> Client Component
+```
+
+Do not mark an entire page as client just because one button is interactive.
+
+---
+
+## SSR / CSR / SSG Rules
+
+Choose rendering model intentionally:
+
+```txt
+CSR -> private dashboards, admin panels, apps behind login
+SSR -> public dynamic pages, SEO, fresh request-time data
+SSG -> docs, blogs, marketing pages, rarely changing content
+```
+
+Do not choose Next.js just because it is popular.
+
+For private dashboards without SEO needs:
+
+```txt
+React + Vite + React Router + TanStack Query
+```
+
+is usually a strong default.
+
+---
+
+## Hydration Rules
+
+Avoid unstable values during server/client initial render:
+
+```txt
+new Date()
+Math.random()
+window
+localStorage
+timezone-dependent formatting
+browser-only conditions in JSX
+invalid HTML nesting
+```
+
+If browser-only data is needed, read it after mount or from server-safe sources like cookies.
+
+Bad:
+
+```tsx
+function CurrentTime() {
+  return <p>{new Date().toLocaleTimeString()}</p>;
+}
+```
+
+Good:
+
+```tsx
+function CurrentTime() {
+  const [time, setTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTime(new Date().toLocaleTimeString());
+  }, []);
+
+  if (time === null) {
+    return <p>Loading time...</p>;
+  }
+
+  return <p>{time}</p>;
+}
+```
+
+---
+
+## Final Code Quality Checklist
+
+Before finalizing generated code, check:
 
 - Is state stored in the right place?
 - Is server state handled by TanStack Query?
+- Are all query parameters included in `queryKey`?
+- Are mutations invalidating related queries?
 - Are derived values calculated during render?
 - Is `useEffect` really needed?
-- Are all props and API responses typed?
-- Are loading/error/empty states handled?
+- Are all props typed?
+- Are events typed?
+- Are API inputs/outputs typed?
+- Is runtime validation needed via Zod?
+- Are loading/error/empty/success states handled?
 - Is the component accessible?
 - Is the component easy to test?
 - Is this abstraction really needed?
+- Is this component in the correct layer: page, feature, or shared?
+- Is performance optimized only where there is a real reason?
+- Is the code readable for another senior developer?
+
+---
+
+## Default Decision Table
+
+```txt
+API GET data                     -> TanStack Query
+API POST/PATCH/DELETE            -> useMutation
+modal open                       -> local useState
+search/page/sort for table       -> URL search params
+login form fields                -> form state
+complex form                     -> React Hook Form + Zod
+currentUser                      -> useCurrentUserQuery
+permission checks                -> permission helpers
+simple derived value             -> calculate during render
+expensive derived value          -> useMemo only if justified
+DOM focus                        -> useRef
+large list DOM problem           -> virtualization
+large route/component bundle     -> lazy loading / code splitting
+unexpected runtime error         -> Error Boundary
+expected API error               -> ErrorState
+success after mutation           -> toast + cache invalidation
+```

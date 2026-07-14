@@ -85,7 +85,7 @@ describe('useContextForm', () => {
         });
 
         expect(result.current.currentStep).toBe(1);
-        expect(result.current.errors.form).toBe('Please complete all required fields');
+        expect(result.current.errors.teamSize).toBe('Please select team size');
     });
 
     it('moves from step 2 to step 3 when traffic pattern is filled', () => {
@@ -127,7 +127,7 @@ describe('useContextForm', () => {
         });
 
         expect(result.current.currentStep).toBe(2);
-        expect(result.current.errors.form).toBe('Please complete all required fields');
+        expect(result.current.errors.trafficPattern).toBe('Please select traffic pattern');
     });
 
     it('moves from step 3 to step 4 when budget sensitivity is filled', () => {
@@ -188,7 +188,9 @@ describe('useContextForm', () => {
         });
 
         expect(result.current.currentStep).toBe(4);
-        expect(result.current.errors.form).toBe('Please complete all required fields');
+        expect(result.current.errors.complianceRequirements).toBe(
+            'Please select at least one compliance requirement'
+        );
     });
 
     it('moves from step 4 to step 5 when compliance requirements are selected', () => {

@@ -1,25 +1,10 @@
 import {useState} from 'react';
-import {isContextComplete, ProjectContext} from '@/domain/context';
-
-function validateStep(step: number, context: Partial<ProjectContext>): boolean {
-    switch (step) {
-        case 1:
-            return context.teamSize !== undefined;
-        case 2:
-            return context.trafficPattern !== undefined;
-        case 3:
-            return context.budgetSensitivity !== undefined;
-        case 4:
-            return (
-                Array.isArray(context.complianceRequirements) &&
-                context.complianceRequirements.length > 0
-            );
-        case 5:
-            return context.operationalMaturity !== undefined;
-        default:
-            return false;
-    }
-}
+import {
+    isContextComplete,
+    isStepValid,
+    ProjectContext,
+    validateStep,
+} from '@/domain/context';
 
 export function useContextForm() {
     const [context, setContext] = useState<Partial<ProjectContext>>({});
@@ -32,11 +17,11 @@ export function useContextForm() {
     }
 
     function nextStep() {
-        if (validateStep(currentStep, context)) {
+        if (isStepValid(currentStep, context)) {
             setCurrentStep((prev) => Math.min(prev + 1, 5));
             setErrors({});
         } else {
-            setErrors({form: 'Please complete all required fields'});
+            setErrors(validateStep(currentStep, context));
         }
     }
 

@@ -1,4 +1,4 @@
-import {DecisionsResponse} from '@/domain/decisions';
+import {DecisionsResponse, decisionsResponseSchema} from '@/domain/decisions';
 
 const DECISIONS_STORAGE_KEY = 'arch-decisions:decisions';
 
@@ -13,7 +13,8 @@ export function getDecisions(): DecisionsResponse | null {
     }
 
     try {
-        return JSON.parse(rawValue) as DecisionsResponse;
+        const parsed = decisionsResponseSchema.safeParse(JSON.parse(rawValue));
+        return parsed.success ? parsed.data : null;
     } catch {
         return null;
     }

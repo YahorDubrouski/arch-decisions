@@ -1,0 +1,8 @@
+.container {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    text-align: center;
+}
