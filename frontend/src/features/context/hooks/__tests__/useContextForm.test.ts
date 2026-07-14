@@ -130,6 +130,139 @@ describe('useContextForm', () => {
         expect(result.current.errors.form).toBe('Please complete all required fields');
     });
 
+    it('moves from step 3 to step 4 when budget sensitivity is filled', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({
+                teamSize: '6-20',
+                trafficPattern: 'variable',
+            });
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.updateContext({budgetSensitivity: 'balanced'});
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.currentStep).toBe(4);
+        expect(result.current.errors).toEqual({});
+    });
+
+    it('shows error on step 4 when no compliance requirement is selected', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({
+                teamSize: '6-20',
+                trafficPattern: 'variable',
+                budgetSensitivity: 'balanced',
+            });
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.currentStep).toBe(4);
+        expect(result.current.errors.form).toBe('Please complete all required fields');
+    });
+
+    it('moves from step 4 to step 5 when compliance requirements are selected', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({
+                teamSize: '6-20',
+                trafficPattern: 'variable',
+                budgetSensitivity: 'balanced',
+            });
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.updateContext({complianceRequirements: ['SOC2']});
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.currentStep).toBe(5);
+        expect(result.current.errors).toEqual({});
+    });
+
+    it('enables submit on step 5 when operational maturity is filled', () => {
+        const {result} = renderHook(() => useContextForm());
+
+        act(() => {
+            result.current.updateContext({
+                teamSize: '6-20',
+                trafficPattern: 'variable',
+                budgetSensitivity: 'balanced',
+                complianceRequirements: ['SOC2'],
+            });
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        act(() => {
+            result.current.nextStep();
+        });
+
+        expect(result.current.canSubmit).toBe(false);
+
+        act(() => {
+            result.current.updateContext({operationalMaturity: 'moderate'});
+        });
+
+        expect(result.current.canSubmit).toBe(true);
+    });
+
     it('moves to previous step', () => {
         const {result} = renderHook(() => useContextForm());
 

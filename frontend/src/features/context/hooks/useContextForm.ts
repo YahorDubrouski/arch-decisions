@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {isContextComplete, ProjectContext, validateContext} from '@/domain/context';
+import {isContextComplete, ProjectContext} from '@/domain/context';
 
 function validateStep(step: number, context: Partial<ProjectContext>): boolean {
     switch (step) {
@@ -7,8 +7,17 @@ function validateStep(step: number, context: Partial<ProjectContext>): boolean {
             return context.teamSize !== undefined;
         case 2:
             return context.trafficPattern !== undefined;
+        case 3:
+            return context.budgetSensitivity !== undefined;
+        case 4:
+            return (
+                Array.isArray(context.complianceRequirements) &&
+                context.complianceRequirements.length > 0
+            );
+        case 5:
+            return context.operationalMaturity !== undefined;
         default:
-            return validateContext(context);
+            return false;
     }
 }
 
