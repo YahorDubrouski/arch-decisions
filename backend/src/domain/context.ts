@@ -9,21 +9,43 @@ export interface ProjectContext {
 }
 
 export function validateContext(context: unknown): context is ProjectContext {
-    if (typeof context !== 'object' || context === null) {
-        return false;
+    return getContextValidationErrors(context).length === 0;
+}
+
+export function getContextValidationErrors(value: unknown): string[] {
+    const errors: string[] = [];
+
+    if (typeof value !== 'object' || value === null) {
+        errors.push('Context must be an object');
+        return errors;
     }
 
-    const ctx = context as Partial<ProjectContext>;
+    const ctx = value as Partial<ProjectContext>;
 
-    return (
-        ctx.teamSize !== undefined &&
-        ['1-5', '6-20', '21-50', '50+'].includes(ctx.teamSize) &&
-        ctx.trafficPattern !== undefined &&
-        ['low-steady', 'variable', 'high-spike', 'unpredictable'].includes(ctx.trafficPattern) &&
-        ctx.budgetSensitivity !== undefined &&
-        ['cost-optimized', 'balanced', 'performance-first'].includes(ctx.budgetSensitivity) &&
-        Array.isArray(ctx.complianceRequirements) &&
-        ctx.operationalMaturity !== undefined &&
-        ['minimal', 'moderate', 'advanced', 'enterprise'].includes(ctx.operationalMaturity)
-    );
+    if (ctx.teamSize === undefined || !['1-5', '6-20', '21-50', '50+'].includes(ctx.teamSize)) {
+        errors.push('teamSize is required and must be one of: 1-5, 6-20, 21-50, 50+');
+    }
+    if (
+        ctx.trafficPattern === undefined ||
+        !['low-steady', 'variable', 'high-spike', 'unpredictable'].includes(ctx.trafficPattern)
+    ) {
+        errors.push('trafficPattern is required and must be one of: low-steady, variable, high-spike, unpredictable');
+    }
+    if (
+        ctx.budgetSensitivity === undefined ||
+        !['cost-optimized', 'balanced', 'performance-first'].includes(ctx.budgetSensitivity)
+    ) {
+        errors.push('budgetSensitivity is required and must be one of: cost-optimized, balanced, performance-first');
+    }
+    if (!Array.isArray(ctx.complianceRequirements)) {
+        errors.push('complianceRequirements must be an array');
+    }
+    if (
+        ctx.operationalMaturity === undefined ||
+        !['minimal', 'moderate', 'advanced', 'enterprise'].includes(ctx.operationalMaturity)
+    ) {
+        errors.push('operationalMaturity is required and must be one of: minimal, moderate, advanced, enterprise');
+    }
+
+    return errors;
 }

@@ -2,22 +2,20 @@ import express from 'express';
 import cors from 'cors';
 import {registerHealthRoutes} from './routes/health.routes.js';
 import {registerDecisionsRoutes} from './routes/decisions.routes.js';
-import {DecisionsController} from './controllers/decisions.controller.js';
-import {EvaluateDecisionsService} from './services/decisions/evaluate-decisions.service.js';
-import {OpenAIDecisionsProvider} from './integrations/openai/openai-decisions.provider.js';
+import {registerArchitectureDecisionsRoutes} from './routes/architecture-decisions.routes.js';
+import {createAppContainer} from './app/create-app-container.js';
 
 export function createApp() {
-  const app = express();
+    const app = express();
 
-  app.use(cors());
-  app.use(express.json());
+    app.use(cors());
+    app.use(express.json());
 
-  const decisionProvider = new OpenAIDecisionsProvider();
-  const evaluateDecisionsService = new EvaluateDecisionsService(decisionProvider);
-  const decisionsController = new DecisionsController(evaluateDecisionsService);
+    const container = createAppContainer();
 
-  registerHealthRoutes(app);
-  registerDecisionsRoutes(app, decisionsController);
+    registerHealthRoutes(app);
+    registerDecisionsRoutes(app, container.resolve('decisionsController'));
+    registerArchitectureDecisionsRoutes(app, container.resolve('architectureDecisionsController'));
 
-  return app;
+    return app;
 }

@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import {getOpenAIConfig} from '../../config/openai.config.js';
+import {getOpenAIConfig} from '@/config/openai.config.js';
 
 export function createOpenAIClient(): OpenAI {
   const {apiKey} = getOpenAIConfig();

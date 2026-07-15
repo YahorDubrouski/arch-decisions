@@ -6,7 +6,7 @@ alwaysApply: true
 # Clean Code: naming
 
 - **Methods are verbs**; **classes/types are nouns**. Names should answer *what* and *why*, not *how* unless the implementation is the point.
-- **Avoid vague handlers**: prefer `handlePostDecisionsEvaluation` over `evaluate` on HTTP controllers; prefer `evaluateAll` / `findById` over generic `get` / `process` when the domain matters.
+- **HTTP controllers**: use short verb names (`post`, `get`) when the controller class and route already disambiguate; avoid `handle` prefixes and long HTTP-verb echoes like `handlePostArchitectureDecisionGeneration`.
 - **Avoid noise**: drop redundant `data`, `info`, `object` unless they disambiguate. Prefer `projectContext` over `contextData`.
 - **One word per concept** across the codebase (`fetch` vs `get` vs `retrieve` — pick one for the same operation).
 - **Booleans are predicates**: `isValid`, `hasPermission`, `shouldRetry`.

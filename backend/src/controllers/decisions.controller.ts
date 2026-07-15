@@ -1,13 +1,13 @@
 import type {Request, Response} from 'express';
-import type {DecisionsResponse} from '../domain/DecisionsResponse.js';
-import logger from '../lib/logging/logger.js';
-import {validateEvaluateDecisionsRequest} from '../validators/http/evaluate-decisions-request.schema.js';
-import {EvaluateDecisionsService} from '../services/decisions/evaluate-decisions.service.js';
+import type {DecisionsResponse} from '@/domain/DecisionsResponse.js';
+import logger from '@/lib/logging/logger.js';
+import {validateEvaluateDecisionsRequest} from '@/validators/http/evaluate-decisions-request.schema.js';
+import {EvaluateDecisionsService} from '@/services/decisions/evaluate-decisions.service.js';
 
 export class DecisionsController {
   constructor(private readonly evaluateDecisionsService: EvaluateDecisionsService) {}
 
-  async handlePostDecisionsEvaluation(request: Request, response: Response): Promise<void> {
+  async post(request: Request, response: Response): Promise<void> {
     try {
       const unvalidatedContextPayload = this.readProjectContextFromRequestBody(request.body);
       const validationOutcome = validateEvaluateDecisionsRequest(unvalidatedContextPayload);
@@ -16,7 +16,7 @@ export class DecisionsController {
         return;
       }
 
-      const validatedProjectContext = validationOutcome.context;
+      const validatedProjectContext = validationOutcome.data;
       this.logArchitectureEvaluationStarted(validatedProjectContext);
       const architectureDecisions = await this.evaluateDecisionsService.evaluateAll(validatedProjectContext);
       this.logArchitectureEvaluationSucceeded(architectureDecisions);

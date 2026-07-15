@@ -1,7 +1,7 @@
 // Validation adapter: Zod schema for internal DecisionsResponse contract.
 
 import { z } from 'zod';
-import type { DecisionsResponse } from '../../domain/DecisionsResponse.js';
+import type { DecisionsResponse } from '@/domain/DecisionsResponse.js';
 
 const tradeOffLevelSchema = z.enum(['low', 'medium', 'high']);
 

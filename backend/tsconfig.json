@@ -24,15 +24,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@/services/*": [
-        "./src/services/*"
-      ],
-      "@/controllers/*": [
-        "./src/controllers/*"
-      ],
-      "@/domain/*": [
-        "./src/domain/*"
       ]
     }
   },

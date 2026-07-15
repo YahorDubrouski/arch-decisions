@@ -1,9 +1,9 @@
-import type {ProjectContext} from '../../domain/context.js';
-import type {DecisionsResponse} from '../../domain/DecisionsResponse.js';
-import type {DecisionProviderPort} from '../../services/decisions/decision-provider.port.js';
-import {calculateTradeOffs} from '../../domain/trade-off-calculator.js';
+import type {ProjectContext} from '@/domain/context.js';
+import type {DecisionsResponse} from '@/domain/DecisionsResponse.js';
+import type {DecisionProvider} from '@/services/decisions/decision-provider.js';
+import {calculateTradeOffs} from '@/domain/trade-off-calculator.js';
 
-export function createTestMockDecisionProvider(): DecisionProviderPort {
+export function createTestMockDecisionProvider(): DecisionProvider {
   return {
     async evaluateAll(context: ProjectContext): Promise<DecisionsResponse> {
       const compute =

@@ -6,4 +6,9 @@ echo "⚠️  Installing/updating dependencies in bind mount..."
 cd /app && npm install --no-audit --no-fund
 
 # Execute the main command
+if [ "${STORAGE_PROVIDER:-sqlite}" != "memory" ]; then
+  echo "Running database migrations..."
+  npm run migrate
+fi
+
 exec "$@"

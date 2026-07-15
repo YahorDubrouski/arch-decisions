@@ -1,11 +1,11 @@
-import type {DecisionsResponse} from '../../domain/DecisionsResponse.js';
-import type {ProjectContext} from '../../domain/context.js';
-import type {DecisionCategory} from '../../domain/DecisionCategory.js';
-import {calculateTradeOffs} from '../../domain/trade-off-calculator.js';
-import {parseDecisionsResponse} from '../../validators/schemas/DecisionsResponseSchema.js';
-import type {DecisionProviderPort} from '../../services/decisions/decision-provider.port.js';
+import type {DecisionsResponse} from '@/domain/DecisionsResponse.js';
+import type {ProjectContext} from '@/domain/context.js';
+import type {DecisionCategory} from '@/domain/DecisionCategory.js';
+import {calculateTradeOffs} from '@/domain/trade-off-calculator.js';
+import {parseDecisionsResponse} from '@/validators/schemas/DecisionsResponseSchema.js';
+import type {DecisionProvider} from '@/services/decisions/decision-provider.js';
 import {createOpenAIClient} from './openai.client.js';
-import {getOpenAIConfig} from '../../config/openai.config.js';
+import {getOpenAIConfig} from '@/config/openai.config.js';
 import {openAIDecisionsResponseSchema} from './openai-decisions-response.schema.js';
 import type {OpenAIDecisionsResponse} from './openai.types.js';
 
@@ -39,7 +39,7 @@ function toDecisionResult<T extends DecisionCategory>(
   } as DecisionsResponse[T];
 }
 
-export class OpenAIDecisionsProvider implements DecisionProviderPort {
+export class OpenAIDecisionsProvider implements DecisionProvider {
   async evaluateAll(context: ProjectContext): Promise<DecisionsResponse> {
     const client = createOpenAIClient();
     const prompt = buildPrompt(context);
