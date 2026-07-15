@@ -9,6 +9,7 @@ import {useEvaluateDecisionsMutation} from '../useEvaluateDecisionsMutation';
 const mockNavigate = vi.fn();
 const mockEvaluateDecisions = vi.fn();
 const mockSaveDecisions = vi.fn();
+const mockSaveProjectContext = vi.fn();
 
 const completeContext: ProjectContext = {
     teamSize: '6-20',
@@ -70,6 +71,10 @@ vi.mock('@/features/decisions/services/decisionsStorage', () => ({
     saveDecisions: (...args: unknown[]) => mockSaveDecisions(...args),
 }));
 
+vi.mock('@/features/context/services/contextStorage', () => ({
+    saveProjectContext: (...args: unknown[]) => mockSaveProjectContext(...args),
+}));
+
 function createWrapper() {
     return function Wrapper({children}: {children: ReactNode}) {
         return <AppProviders>{children}</AppProviders>;
@@ -94,6 +99,7 @@ describe('useEvaluateDecisionsMutation', () => {
 
         await waitFor(() => {
             expect(mockEvaluateDecisions).toHaveBeenCalledWith(completeContext);
+            expect(mockSaveProjectContext).toHaveBeenCalledWith(completeContext);
             expect(mockSaveDecisions).toHaveBeenCalledWith(sampleDecisions);
             expect(mockNavigate).toHaveBeenCalledWith('/decisions');
         });

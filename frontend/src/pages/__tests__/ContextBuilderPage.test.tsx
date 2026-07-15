@@ -99,7 +99,7 @@ describe('ContextBuilderPage submit', () => {
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Submit'}));
+        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
 
         expect(screen.getByRole('button', {name: 'Submitting…'})).toBeDisabled();
         expect(screen.getByRole('button', {name: 'Back'})).toBeDisabled();
@@ -117,7 +117,7 @@ describe('ContextBuilderPage submit', () => {
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Submit'}));
+        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
 
         expect(
             await screen.findByRole('alert')
@@ -131,7 +131,7 @@ describe('ContextBuilderPage submit', () => {
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Submit'}));
+        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
 
         await waitFor(() => {
             expect(mockSaveDecisions).toHaveBeenCalledWith(sampleDecisions);

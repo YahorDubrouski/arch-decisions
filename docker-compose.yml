@@ -32,6 +32,8 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/data:/app/data
+      - ./backend/package.json:/app/package.json
+      - ./backend/package-lock.json:/app/package-lock.json
       - ./backend/node_modules:/app/node_modules
       - ./backend/jest.config.js:/app/jest.config.js
     networks:

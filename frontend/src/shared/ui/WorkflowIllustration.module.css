@@ -1,0 +1,83 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 22rem;
+}
+
+.glow {
+    position: absolute;
+    inset: 10% 0 auto;
+    height: 70%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(20, 184, 166, 0.18), transparent 70%);
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+.steps {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.stepRow {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-xs);
+}
+
+.stepCard {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: var(--shadow-card);
+}
+
+.iconWrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+}
+
+.stepContext .iconWrap {
+    background: rgba(37, 99, 235, 0.12);
+    color: var(--color-compute);
+}
+
+.stepDecisions .iconWrap {
+    background: rgba(124, 58, 237, 0.12);
+    color: var(--color-secrets);
+}
+
+.stepDocument .iconWrap {
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+}
+
+.stepLabel {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+}
+
+.stepDetail {
+    margin-top: 0.125rem;
+    font-size: var(--font-size-xs);
+    color: var(--color-text-muted);
+}
+
+.arrow {
+    display: flex;
+    justify-content: center;
+    color: var(--color-text-subtle);
+}

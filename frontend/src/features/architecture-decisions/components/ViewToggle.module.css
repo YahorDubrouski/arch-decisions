@@ -1,0 +1,35 @@
+.toggle {
+    display: inline-flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-full);
+    background: var(--color-surface-muted);
+}
+
+.toggle button {
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition:
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+.active {
+    background: var(--color-primary);
+    color: var(--color-primary-contrast);
+}
+
+.inactive {
+    background: transparent;
+    color: var(--color-text-muted);
+}
+
+.inactive:hover {
+    color: var(--color-text);
+    background: var(--color-surface);
+}

@@ -1,17 +1,76 @@
-/* ==========================================================================
-   Component: DecisionCard
-   ========================================================================== */
-
 .card {
+    position: relative;
     padding: var(--spacing-lg);
     border: 1px solid var(--color-border-light);
     border-radius: var(--radius-md);
     background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    transition:
+        box-shadow var(--transition-base),
+        transform var(--transition-base);
+}
+
+.card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    inset-block: var(--spacing-md);
+    inset-inline-start: 0;
+    width: 3px;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    background: var(--card-accent, var(--color-primary));
+}
+
+.cardCompute {
+    --card-accent: var(--color-compute);
+}
+
+.cardSecrets {
+    --card-accent: var(--color-secrets);
+}
+
+.cardCicd {
+    --card-accent: var(--color-cicd);
+}
+
+.header {
+    margin-bottom: var(--spacing-md);
+}
+
+.headerTop {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.iconWrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--card-accent, var(--color-primary)) 12%, transparent);
+    color: var(--card-accent, var(--color-primary));
+}
+
+.categoryBadge {
+    display: inline-block;
+    color: var(--color-text-subtle);
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 .title {
-    margin-bottom: var(--spacing-md);
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
     color: var(--color-text);
 }
 
@@ -26,20 +85,24 @@
 .sectionLabel {
     display: block;
     margin-bottom: var(--spacing-xs);
-    font-size: var(--font-size-sm);
-    color: var(--color-text-muted);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .recommended {
     font-size: var(--font-size-base);
-    font-weight: 600;
-    color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
 }
 
 .alternatives {
     margin: 0;
     padding-left: var(--spacing-lg);
-    color: var(--color-text);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
 }
 
 .alternatives li {

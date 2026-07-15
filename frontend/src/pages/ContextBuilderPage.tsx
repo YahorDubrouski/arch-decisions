@@ -7,8 +7,19 @@ import {Step2TrafficPattern} from '@/features/context/components/Step2TrafficPat
 import {Step3BudgetSensitivity} from '@/features/context/components/Step3BudgetSensitivity';
 import {Step4ComplianceRequirements} from '@/features/context/components/Step4ComplianceRequirements';
 import {Step5OperationalMaturity} from '@/features/context/components/Step5OperationalMaturity';
+import {StepProgress} from '@/features/context/components/StepProgress';
 import {ErrorState} from '@/shared/ui/ErrorState';
+import {ContextIcon} from '@/shared/ui/icons/Icons';
+import ui from '@/shared/styles/ui.module.css';
 import styles from './ContextBuilderPage.module.css';
+
+const STEP_LABELS = [
+    'Team size',
+    'Traffic pattern',
+    'Budget sensitivity',
+    'Compliance',
+    'Operational maturity',
+] as const;
 
 export function ContextBuilderPage() {
     const {context, updateContext, currentStep, nextStep, previousStep, errors, canSubmit} =
@@ -32,9 +43,24 @@ export function ContextBuilderPage() {
     }
 
     return (
-        <div className={styles.page}>
-            <h1>Project Context Builder</h1>
-            <div className={styles.stepIndicator}>Step {currentStep} of 5</div>
+        <div className={`${ui.pagePanel} ${styles.page}`}>
+            <header className={styles.pageHeader}>
+                <span className={ui.pageIconWrap}>
+                    <ContextIcon size={22}/>
+                </span>
+                <div>
+                    <h1 className={ui.pageTitle}>Project context</h1>
+                    <p className={ui.pageLead}>
+                        Define constraints that drive compute, security, and delivery recommendations.
+                    </p>
+                </div>
+            </header>
+
+            <StepProgress
+                currentStep={currentStep}
+                totalSteps={5}
+                label={STEP_LABELS[currentStep - 1]}
+            />
 
             <form onSubmit={handleSubmit} aria-busy={isSubmitting}>
                 {currentStep === 1 && (
@@ -79,15 +105,17 @@ export function ContextBuilderPage() {
 
                 <div className={styles.navigation}>
                     {currentStep > 1 && (
-                        <button type="button" onClick={previousStep} disabled={isSubmitting}>
+                        <button type="button" className={ui.btnSecondary} onClick={previousStep} disabled={isSubmitting}>
                             Back
                         </button>
                     )}
                     {currentStep < 5 ? (
-                        <button type="submit">Next</button>
+                        <button type="submit" className={ui.btnPrimary}>
+                            Next
+                        </button>
                     ) : (
-                        <button type="submit" disabled={!canSubmit || isSubmitting}>
-                            {isSubmitting ? 'Submitting…' : 'Submit'}
+                        <button type="submit" className={ui.btnPrimary} disabled={!canSubmit || isSubmitting}>
+                            {isSubmitting ? 'Submitting…' : 'Evaluate decisions'}
                         </button>
                     )}
                 </div>

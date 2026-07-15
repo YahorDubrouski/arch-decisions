@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Global reset & base document styles
+   Global document & shared UI primitives
    ========================================================================== */
 
 *,
@@ -10,11 +10,54 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
+    line-height: var(--line-height-base);
+    font-weight: var(--font-weight-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--color-bg);
+    background-image:
+        linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(20, 184, 166, 0.14), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, rgba(2, 132, 199, 0.08), transparent 50%);
+    background-size: 48px 48px, 48px 48px, auto, auto;
     color: var(--color-text);
+    min-height: 100vh;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+a {
+    color: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+h1,
+h2,
+h3 {
+    letter-spacing: var(--letter-spacing-tight);
+    line-height: var(--line-height-tight);
 }

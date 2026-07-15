@@ -1,0 +1,27 @@
+.page {
+    margin-top: 0;
+}
+
+.header {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.title {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.meta {
+    margin-top: var(--spacing-sm);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
+
+.loading {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+}
