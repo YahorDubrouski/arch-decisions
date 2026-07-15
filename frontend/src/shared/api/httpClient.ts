@@ -15,6 +15,17 @@ export class HttpClientError extends Error {
     }
 }
 
+export type JsonRequestOptions = {
+    signal?: AbortSignal;
+};
+
+export function isAbortError(error: unknown): boolean {
+    return (
+        (error instanceof DOMException && error.name === 'AbortError') ||
+        (error instanceof Error && error.name === 'AbortError')
+    );
+}
+
 function formatHttpErrorPayload(payload: HttpErrorPayload, fallback: string): string {
     const baseMessage = payload.error ?? payload.message ?? fallback;
 
@@ -35,6 +46,10 @@ async function parseErrorMessage(response: Response, fallback: string): Promise<
 }
 
 export function resolveSubmitError(error: unknown): string {
+    if (isAbortError(error)) {
+        return 'Request cancelled.';
+    }
+
     if (error instanceof HttpClientError) {
         if (error.status >= 500) {
             return 'Server error. Please try again.';
@@ -74,12 +89,14 @@ async function parseJsonResponse<TResponseBody>(
 export async function postJson<TRequestBody, TResponseBody = void>(
     path: string,
     body: TRequestBody,
-    responseSchema?: ZodType<TResponseBody>
+    responseSchema?: ZodType<TResponseBody>,
+    options?: JsonRequestOptions
 ): Promise<TResponseBody> {
     const response = await fetch(`${API_BASE}${path}`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(body),
+        signal: options?.signal,
     });
 
     if (!response.ok) {
@@ -96,9 +113,12 @@ export async function postJson<TRequestBody, TResponseBody = void>(
 
 export async function getJson<TResponseBody>(
     path: string,
-    responseSchema?: ZodType<TResponseBody>
+    responseSchema?: ZodType<TResponseBody>,
+    options?: JsonRequestOptions
 ): Promise<TResponseBody | null> {
-    const response = await fetch(`${API_BASE}${path}`);
+    const response = await fetch(`${API_BASE}${path}`, {
+        signal: options?.signal,
+    });
 
     if (response.status === 404) {
         return null;

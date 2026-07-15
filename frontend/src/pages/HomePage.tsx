@@ -1,4 +1,5 @@
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import {clearProjectSession, hasProjectSession} from '@/shared/session/projectSession';
 import {WorkflowIllustration} from '@/shared/ui/WorkflowIllustration';
 import {CheckCircleIcon} from '@/shared/ui/icons/Icons';
 import ui from '@/shared/styles/ui.module.css';
@@ -11,6 +12,22 @@ const FEATURES = [
 ] as const;
 
 export function HomePage() {
+    const navigate = useNavigate();
+
+    function handleStartNewProject(): void {
+        if (hasProjectSession()) {
+            const confirmed = window.confirm(
+                'Start a new project? This clears your current context, decisions, and documents from this session.'
+            );
+            if (!confirmed) {
+                return;
+            }
+        }
+
+        clearProjectSession();
+        navigate('/context');
+    }
+
     return (
         <div className={styles.hero}>
             <div className={styles.heroContent}>
@@ -34,9 +51,9 @@ export function HomePage() {
                 </ul>
 
                 <div className={styles.actions}>
-                    <Link to="/context" className={ui.btnPrimary}>
+                    <button type="button" className={ui.btnPrimary} onClick={handleStartNewProject}>
                         Start new project
-                    </Link>
+                    </button>
                     <Link to="/decisions" className={ui.btnSecondary}>
                         View decisions
                     </Link>

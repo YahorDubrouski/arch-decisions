@@ -9,6 +9,11 @@ export interface ArchitectureDecision {
     createdAt: string;
 }
 
+export type ArchitectureDecisionListItem = Pick<
+    ArchitectureDecision,
+    'id' | 'title' | 'status' | 'summary' | 'createdAt'
+>;
+
 export interface ArchitectureDecisionDraft {
     title: string;
     status: typeof architectureDecisionStatus;

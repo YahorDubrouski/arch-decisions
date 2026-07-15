@@ -21,3 +21,7 @@
 .container p {
     max-width: 28rem;
 }
+
+.action {
+    margin-top: var(--spacing-xs);
+}

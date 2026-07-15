@@ -98,7 +98,10 @@ describe('useEvaluateDecisionsMutation', () => {
         });
 
         await waitFor(() => {
-            expect(mockEvaluateDecisions).toHaveBeenCalledWith(completeContext);
+            expect(mockEvaluateDecisions).toHaveBeenCalledWith(
+                completeContext,
+                expect.any(AbortSignal)
+            );
             expect(mockSaveProjectContext).toHaveBeenCalledWith(completeContext);
             expect(mockSaveDecisions).toHaveBeenCalledWith(sampleDecisions);
             expect(mockNavigate).toHaveBeenCalledWith('/decisions');
@@ -121,5 +124,42 @@ describe('useEvaluateDecisionsMutation', () => {
                 'Could not reach the server. Check that backend is running.'
             );
         });
+    });
+
+    it('cancels in-flight evaluation without showing an abort error', async () => {
+        let rejectWithAbort: ((error: Error) => void) | undefined;
+        mockEvaluateDecisions.mockImplementation(
+            (_context: ProjectContext, signal?: AbortSignal) =>
+                new Promise((_resolve, reject) => {
+                    rejectWithAbort = reject;
+                    signal?.addEventListener('abort', () => {
+                        reject(new DOMException('Aborted', 'AbortError'));
+                    });
+                })
+        );
+
+        const {result} = renderHook(() => useEvaluateDecisionsMutation(), {
+            wrapper: createWrapper(),
+        });
+
+        act(() => {
+            result.current.submit(completeContext);
+        });
+
+        await waitFor(() => {
+            expect(result.current.isSubmitting).toBe(true);
+        });
+
+        act(() => {
+            result.current.cancel();
+        });
+
+        await waitFor(() => {
+            expect(result.current.isSubmitting).toBe(false);
+            expect(result.current.submitError).toBeNull();
+            expect(mockNavigate).not.toHaveBeenCalled();
+        });
+
+        void rejectWithAbort;
     });
 });

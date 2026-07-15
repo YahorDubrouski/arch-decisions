@@ -39,6 +39,15 @@ export class ArchitectureDecisionsController {
         }
     }
 
+    list(_request: Request, response: Response): void {
+        try {
+            const architectureDecisions = this.architectureDecisionRepository.list();
+            this.sendOkWithArchitectureDecisionList(response, architectureDecisions);
+        } catch (error) {
+            this.sendInternalErrorForListFailure(response, error);
+        }
+    }
+
     get(request: Request, response: Response): void {
         try {
             const decisionId = request.params.decisionId;
@@ -88,6 +97,10 @@ export class ArchitectureDecisionsController {
         response.status(200).json({architectureDecision});
     }
 
+    private sendOkWithArchitectureDecisionList(response: Response, architectureDecisions: unknown): void {
+        response.status(200).json({architectureDecisions});
+    }
+
     private sendInternalErrorForGenerationFailure(
         response: Response,
         requestBody: unknown,
@@ -108,6 +121,14 @@ export class ArchitectureDecisionsController {
     ): void {
         logger.error('Architecture decision retrieval failed', {
             decisionId,
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+        });
+        response.status(500).json({error: 'Internal server error'});
+    }
+
+    private sendInternalErrorForListFailure(response: Response, error: unknown): void {
+        logger.error('Architecture decision list failed', {
             message: error instanceof Error ? error.message : String(error),
             stack: error instanceof Error ? error.stack : undefined,
         });

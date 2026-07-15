@@ -26,4 +26,10 @@ describe('resolveSubmitError', () => {
             'Received an invalid response from the server.'
         );
     });
+
+    it('returns cancel message for abort errors', () => {
+        expect(resolveSubmitError(new DOMException('Aborted', 'AbortError'))).toBe(
+            'Request cancelled.'
+        );
+    });
 });

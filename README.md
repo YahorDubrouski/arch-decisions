@@ -404,6 +404,7 @@ npm run dev
 | [docs/examples/](./docs/examples/) | Sample contexts, ADRs, full journey walkthrough |
 | [docs/COMPETENCY_MAP.md](./docs/COMPETENCY_MAP.md) | Which features demonstrate which competencies |
 | [README-FRONTEND.md](./README-FRONTEND.md) | Frontend-focused guide for React hiring reviewers |
+| [checklist.md](./checklist.md) | Validated progress vs plan (done / deferred / intentional alternatives) |
 | [ITERATION_PLAN.md](./ITERATION_PLAN.md) | Original iteration breakdown |
 
 **Quick start for reviewers:** Read [full journey](./docs/examples/flows/full-journey.md) → try [startup scenario](./docs/examples/scenarios/startup-cost-optimized.json) in the UI.

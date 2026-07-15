@@ -1,7 +1,7 @@
 import {ReactNode} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {LogoMark} from '@/shared/brand/LogoMark';
-import {ContextIcon, DecisionsIcon, HomeIcon} from '@/shared/ui/icons/Icons';
+import {ContextIcon, DecisionsIcon, DocumentIcon, HomeIcon} from '@/shared/ui/icons/Icons';
 import styles from './AppShell.module.css';
 
 type AppShellProps = {
@@ -9,9 +9,10 @@ type AppShellProps = {
 };
 
 const NAV_ITEMS = [
-    {to: '/', label: 'Home', Icon: HomeIcon},
-    {to: '/context', label: 'Context', Icon: ContextIcon},
-    {to: '/decisions', label: 'Decisions', Icon: DecisionsIcon},
+    {to: '/', label: 'Home', Icon: HomeIcon, end: true},
+    {to: '/context', label: 'Context', Icon: ContextIcon, end: false},
+    {to: '/decisions', label: 'Decisions', Icon: DecisionsIcon, end: false},
+    {to: '/architecture-decisions', label: 'Documents', Icon: DocumentIcon, end: false},
 ] as const;
 
 export function AppShell({children}: AppShellProps) {
@@ -31,10 +32,10 @@ export function AppShell({children}: AppShellProps) {
 
                     <nav className={styles.nav} aria-label="Main">
                         {NAV_ITEMS.map((item) => {
-                            const isActive =
-                                item.to === '/'
-                                    ? location.pathname === '/'
-                                    : location.pathname.startsWith(item.to);
+                            const isActive = item.end
+                                ? location.pathname === item.to
+                                : location.pathname === item.to ||
+                                  location.pathname.startsWith(`${item.to}/`);
 
                             return (
                                 <Link

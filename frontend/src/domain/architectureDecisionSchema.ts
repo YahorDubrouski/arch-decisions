@@ -17,7 +17,16 @@ export const architectureDecisionApiResponseSchema = z.object({
     architectureDecision: architectureDecisionSchema,
 });
 
+export const architectureDecisionListItemSchema = architectureDecisionSchema.omit({
+    content: true,
+});
+
+export const architectureDecisionListApiResponseSchema = z.object({
+    architectureDecisions: z.array(architectureDecisionListItemSchema),
+});
+
 export type ArchitectureDecision = z.infer<typeof architectureDecisionSchema>;
+export type ArchitectureDecisionListItem = z.infer<typeof architectureDecisionListItemSchema>;
 
 export type GenerateArchitectureDecisionRequest = {
     context: ProjectContext;

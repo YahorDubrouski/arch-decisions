@@ -5,11 +5,15 @@ import {
 } from '@/domain/decisions';
 import {postJson} from '@/shared/api/httpClient';
 
-export async function evaluateDecisions(context: ProjectContext): Promise<DecisionsResponse> {
+export async function evaluateDecisions(
+    context: ProjectContext,
+    signal?: AbortSignal
+): Promise<DecisionsResponse> {
     const response = await postJson(
         '/api/decisions/evaluate',
         context,
-        evaluateDecisionsApiResponseSchema
+        evaluateDecisionsApiResponseSchema,
+        {signal}
     );
     return response.decisions;
 }

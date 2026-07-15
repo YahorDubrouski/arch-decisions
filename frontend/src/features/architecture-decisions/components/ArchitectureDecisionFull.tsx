@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown';
 import styles from './ArchitectureDecisionFull.module.css';
 
 type ArchitectureDecisionFullProps = {
@@ -6,8 +7,11 @@ type ArchitectureDecisionFullProps = {
 
 export function ArchitectureDecisionFull({content}: ArchitectureDecisionFullProps) {
     return (
-        <pre className={styles.content} aria-label="Architecture decision full document">
-            {content}
-        </pre>
+        <article
+            className={styles.document}
+            aria-label="Architecture decision full document"
+        >
+            <ReactMarkdown>{content}</ReactMarkdown>
+        </article>
     );
 }

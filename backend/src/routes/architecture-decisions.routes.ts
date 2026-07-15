@@ -9,6 +9,10 @@ export function registerArchitectureDecisionsRoutes(
         void architectureDecisionsController.post(request, response);
     });
 
+    app.get('/api/architecture-decisions', (request, response) => {
+        architectureDecisionsController.list(request, response);
+    });
+
     app.get('/api/architecture-decisions/:decisionId', (request, response) => {
         architectureDecisionsController.get(request, response);
     });

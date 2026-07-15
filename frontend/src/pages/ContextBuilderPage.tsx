@@ -24,7 +24,8 @@ const STEP_LABELS = [
 export function ContextBuilderPage() {
     const {context, updateContext, currentStep, nextStep, previousStep, errors, canSubmit} =
         useContextForm();
-    const {submit, isSubmitting, submitError, resetSubmitError} = useEvaluateDecisionsMutation();
+    const {submit, cancel, isSubmitting, submitError, resetSubmitError} =
+        useEvaluateDecisionsMutation();
 
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -114,9 +115,16 @@ export function ContextBuilderPage() {
                             Next
                         </button>
                     ) : (
-                        <button type="submit" className={ui.btnPrimary} disabled={!canSubmit || isSubmitting}>
-                            {isSubmitting ? 'Submitting…' : 'Evaluate decisions'}
-                        </button>
+                        <>
+                            <button type="submit" className={ui.btnPrimary} disabled={!canSubmit || isSubmitting}>
+                                {isSubmitting ? 'Submitting…' : 'Evaluate decisions'}
+                            </button>
+                            {isSubmitting && (
+                                <button type="button" className={ui.btnGhost} onClick={cancel}>
+                                    Cancel
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             </form>

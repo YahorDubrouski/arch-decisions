@@ -12,7 +12,8 @@ import styles from './DecisionsPage.module.css';
 export function DecisionsPage() {
     const decisions = getDecisions();
     const context = getProjectContext();
-    const {submit, isSubmitting, submitError, resetSubmitError} = useGenerateArchitectureDecisionMutation();
+    const {submit, cancel, isSubmitting, submitError, resetSubmitError} =
+        useGenerateArchitectureDecisionMutation();
 
     function handleGenerateArchitectureDecision(): void {
         if (!decisions || !context) {
@@ -49,6 +50,11 @@ export function DecisionsPage() {
                 <EmptyState
                     icon={<EmptyDecisionsIcon/>}
                     message="No decisions yet. Complete the context workflow to evaluate recommendations."
+                    action={
+                        <Link to="/context" className={ui.btnPrimary}>
+                            Start context workflow
+                        </Link>
+                    }
                 />
             )}
 
@@ -75,8 +81,22 @@ export function DecisionsPage() {
                         {isSubmitting ? 'Generating document…' : 'Generate architecture decision'}
                     </button>
                 )}
-                <Link to="/context" className={ui.btnSecondary}>
-                    Edit context
+                {isSubmitting && (
+                    <button type="button" className={ui.btnGhost} onClick={cancel}>
+                        Cancel
+                    </button>
+                )}
+                {decisions ? (
+                    <Link to="/context" className={ui.btnSecondary}>
+                        Edit context
+                    </Link>
+                ) : (
+                    <Link to="/context" className={ui.btnSecondary}>
+                        Go to context
+                    </Link>
+                )}
+                <Link to="/architecture-decisions" className={ui.btnGhost}>
+                    Saved documents
                 </Link>
                 <Link to="/" className={ui.btnGhost}>
                     Home

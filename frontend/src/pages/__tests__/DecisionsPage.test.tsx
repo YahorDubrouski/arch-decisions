@@ -9,12 +9,15 @@ import {clearDecisions, saveDecisions} from '@/features/decisions/services/decis
 import {DecisionsPage} from '../DecisionsPage';
 
 const mockSubmit = vi.fn();
+const mockCancel = vi.fn();
 const mockResetSubmitError = vi.fn();
+let mockIsSubmitting = false;
 
 vi.mock('@/features/architecture-decisions/hooks/useGenerateArchitectureDecisionMutation', () => ({
     useGenerateArchitectureDecisionMutation: () => ({
         submit: mockSubmit,
-        isSubmitting: false,
+        cancel: mockCancel,
+        isSubmitting: mockIsSubmitting,
         submitError: null,
         resetSubmitError: mockResetSubmitError,
     }),
@@ -68,10 +71,11 @@ describe('DecisionsPage', () => {
     afterEach(() => {
         clearDecisions();
         clearProjectContext();
+        mockIsSubmitting = false;
         vi.clearAllMocks();
     });
 
-    it('renders empty state when no decisions are stored', () => {
+    it('renders empty state with a context workflow CTA when no decisions are stored', () => {
         render(
             <MemoryRouter>
                 <DecisionsPage/>
@@ -80,6 +84,9 @@ describe('DecisionsPage', () => {
 
         expect(screen.getByRole('heading', {name: /architecture decisions/i})).toBeInTheDocument();
         expect(screen.getByText(/no decisions yet/i)).toBeInTheDocument();
+        expect(screen.getByRole('link', {name: /start context workflow/i})).toHaveAttribute('href', '/context');
+        expect(screen.getByRole('link', {name: /go to context/i})).toHaveAttribute('href', '/context');
+        expect(screen.queryByRole('button', {name: /generate architecture decision/i})).not.toBeInTheDocument();
     });
 
     it('renders decision cards when decisions are stored', () => {
@@ -132,7 +139,9 @@ describe('DecisionsPage', () => {
         expect(screen.getByText(/project context is missing/i)).toBeInTheDocument();
     });
 
-    it('renders navigation links', () => {
+    it('renders edit-context navigation when decisions exist', () => {
+        saveDecisions(sampleDecisions);
+
         render(
             <MemoryRouter>
                 <DecisionsPage/>
@@ -141,5 +150,21 @@ describe('DecisionsPage', () => {
 
         expect(screen.getByRole('link', {name: /edit context/i})).toHaveAttribute('href', '/context');
         expect(screen.getByRole('link', {name: /home/i})).toHaveAttribute('href', '/');
+    });
+
+    it('shows cancel while generating and calls cancel on click', async () => {
+        const user = userEvent.setup();
+        mockIsSubmitting = true;
+        saveDecisions(sampleDecisions);
+        saveProjectContext(sampleContext);
+
+        render(
+            <MemoryRouter>
+                <DecisionsPage/>
+            </MemoryRouter>
+        );
+
+        await user.click(screen.getByRole('button', {name: /cancel/i}));
+        expect(mockCancel).toHaveBeenCalled();
     });
 });
