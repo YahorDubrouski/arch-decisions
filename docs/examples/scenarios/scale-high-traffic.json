@@ -1,0 +1,11 @@
+{
+  "name": "Growing product with traffic spikes",
+  "description": "Mid-size team, high-spike traffic, balanced budget, SOC2 compliance, advanced ops maturity.",
+  "context": {
+    "teamSize": "21-50",
+    "trafficPattern": "high-spike",
+    "budgetSensitivity": "balanced",
+    "complianceRequirements": ["SOC2"],
+    "operationalMaturity": "advanced"
+  }
+}

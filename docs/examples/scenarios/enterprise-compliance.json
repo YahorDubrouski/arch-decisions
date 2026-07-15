@@ -1,0 +1,11 @@
+{
+  "name": "Enterprise regulated workload",
+  "description": "Large team, variable traffic, performance-first budget, SOC2 and HIPAA requirements.",
+  "context": {
+    "teamSize": "50+",
+    "trafficPattern": "variable",
+    "budgetSensitivity": "performance-first",
+    "complianceRequirements": ["SOC2", "HIPAA"],
+    "operationalMaturity": "enterprise"
+  }
+}

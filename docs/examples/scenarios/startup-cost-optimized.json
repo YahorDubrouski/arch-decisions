@@ -1,0 +1,11 @@
+{
+  "name": "Early-stage startup",
+  "description": "Small team, steady low traffic, cost-sensitive, no formal compliance yet.",
+  "context": {
+    "teamSize": "1-5",
+    "trafficPattern": "low-steady",
+    "budgetSensitivity": "cost-optimized",
+    "complianceRequirements": [],
+    "operationalMaturity": "minimal"
+  }
+}
