@@ -1,26 +1,10 @@
-# Full journey: context → recommendations → architecture decision record
+# Full journey: context → recommendations → ADR
 
-This walkthrough mirrors the UI flow and shows how structured input becomes documented output.
+Walkthrough aligned with the UI. Screenshots: [../screenshots/](../screenshots/).
 
-## Visual tour
+## 1. Context (`/context`)
 
-![Home](../../screenshots/01-home.png)
-
-![Context builder](../../screenshots/02-context.png)
-
-![Recommendations](../../screenshots/03-recommendations.png)
-
-![Documents grid](../../screenshots/04-documents-grid.png)
-
-![ADR summary](../../screenshots/05-adr-summary.png)
-
-![ADR full document](../../screenshots/06-adr-full.png)
-
-## 1. Define project context
-
-**Route:** `/context`
-
-**Example input:** [startup-cost-optimized.json](../scenarios/startup-cost-optimized.json)
+Example payload: [startup-cost-optimized.json](../scenarios/startup-cost-optimized.json)
 
 ```json
 {
@@ -32,76 +16,50 @@ This walkthrough mirrors the UI flow and shows how structured input becomes docu
 }
 ```
 
-**What happens:**
-- User completes the 5-step wizard (team, traffic, budget, compliance, maturity).
-- On submit, the frontend calls `POST /api/recommendations/evaluate` with the context.
-- Context and recommendations are stored in `sessionStorage` for the current browser session.
+Submit enqueues evaluation (HTTP mode) or runs local rules (`VITE_DATA_SOURCE=local`). Context and recommendations stay in the session for the next routes.
 
-## 2. Review recommendations
+## 2. Recommendations (`/recommendations`)
 
-**Route:** `/recommendations`
+Typical output for the startup scenario:
 
-**Representative output** (rule-based evaluation; production may use OpenAI with the same contract):
+| Category | Recommended | Rationale |
+|----------|-------------|-----------|
+| Compute | EC2 | Small team + cost focus |
+| Secrets | AWS Parameter Store | No compliance mandate |
+| CI/CD | GitHub Actions | Low setup cost |
 
-| Category | Recommended | Why it fits this context |
-|----------|-------------|----------------------------|
-| Compute | EC2 | Small team + cost-optimized → minimal orchestration overhead |
-| Secrets | AWS Parameter Store | No compliance mandate → simpler, lower-cost secret storage |
-| CI/CD | GitHub Actions | Cost-optimized team size → managed CI with low setup cost |
+## 3. Generate ADR
 
-Each category card shows alternatives and trade-offs (cost, complexity, risk, ops overhead).
+Action: **Generate architecture decision** on `/recommendations`.
 
-## 3. Generate architecture decision document
+`POST /api/architecture-decisions/generate` with `{ context, recommendations }` → **202** + `jobId` → poll `GET /api/jobs/:jobId`.
 
-**Action:** Click **Generate architecture decision** on `/recommendations`.
+Provider: `ARCHITECTURE_DECISION_GENERATOR_PROVIDER=template` (default) or `openai`.
 
-**API:** `POST /api/architecture-decisions/generate`
+## 4. View and export (`/architecture-decisions/:id`)
 
-```json
-{
-  "context": { "...": "same as step 1" },
-  "recommendations": {
-    "compute": { "category": "compute", "recommended": "EC2", "...": "..." },
-    "secrets": { "...": "..." },
-    "cicd": { "...": "..." }
-  }
-}
-```
+Summary and full markdown views; copy and download. Example document: [startup-cost-optimized.md](../adrs/startup-cost-optimized.md).
 
-**Provider:** `ARCHITECTURE_DECISION_GENERATOR_PROVIDER=template` (deterministic) or `openai` (AI-assisted).
+## Other scenarios
 
-**Response:** Document with `id`, `title`, `status`, `summary`, `content` (markdown), `createdAt`.
+| Scenario | Context | ADR example |
+|----------|---------|-------------|
+| Enterprise | [enterprise-compliance.json](../scenarios/enterprise-compliance.json) | [enterprise-compliance.md](../adrs/enterprise-compliance.md) |
+| High traffic | [scale-high-traffic.json](../scenarios/scale-high-traffic.json) | Generate in UI |
 
-## 4. View and export
-
-**Route:** `/architecture-decisions/:decisionId`
-
-- **Summary view** — condensed rationale for stakeholders.
-- **Full view** — complete markdown ADR.
-- **Copy** / **Download markdown** — export for wikis or git repos.
-
-**Example full document:** [startup-cost-optimized.md](../adrs/startup-cost-optimized.md)
-
-## Try other scenarios
-
-| Scenario | Context file | Example ADR |
-|----------|--------------|-------------|
-| Enterprise regulated | [enterprise-compliance.json](../scenarios/enterprise-compliance.json) | [enterprise-compliance.md](../adrs/enterprise-compliance.md) |
-| High-traffic growth | [scale-high-traffic.json](../scenarios/scale-high-traffic.json) | Generate via UI or API |
-
-## API quick reference
+## API (curl)
 
 ```bash
-# Evaluate recommendations (use the "context" object from a scenario file)
+# Evaluate (returns jobId)
 curl -s -X POST http://localhost:3001/api/recommendations/evaluate \
   -H 'Content-Type: application/json' \
   -d '{"context":{"teamSize":"1-5","trafficPattern":"low-steady","budgetSensitivity":"cost-optimized","complianceRequirements":[],"operationalMaturity":"minimal"}}'
 
-# Generate ADR (requires full request body with context + recommendations from evaluate)
-curl -s -X POST http://localhost:3001/api/architecture-decisions/generate \
-  -H 'Content-Type: application/json' \
-  -d '{ "context": {...}, "recommendations": {...} }'
+# Poll job
+curl -s http://localhost:3001/api/jobs/{jobId}
 
-# Fetch generated ADR
-curl -s http://localhost:3001/api/architecture-decisions/{decisionId}
+# List ADRs
+curl -s 'http://localhost:3001/api/architecture-decisions'
 ```
+
+Full contracts: [reference.md](../../reference.md).

@@ -14,7 +14,8 @@
     "format": "prettier --write \"src/**/*.{ts,json}\"",
     "test": "jest",
     "migrate": "tsx scripts/run-migrations.ts",
-    "migrate:rollback": "tsx scripts/rollback-migrations.ts"
+    "migrate:rollback": "tsx scripts/rollback-migrations.ts",
+    "verify:providers": "tsx scripts/verify-provider-matrix.ts"
   },
   "dependencies": {
     "awilix": "^13.0.5",

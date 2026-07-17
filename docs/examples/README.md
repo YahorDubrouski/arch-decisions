@@ -1,11 +1,9 @@
 # Examples
 
-Static examples for portfolio reviewers and local API testing.
+Static payloads for manual testing and portfolio review.
 
 | Folder | Contents |
 |--------|----------|
-| [scenarios/](./scenarios/) | Sample `ProjectContext` payloads (JSON) |
-| [adrs/](./adrs/) | Example generated ADR documents (markdown) |
-| [flows/](./flows/) | End-to-end walkthroughs |
-
-**Start here:** [Full journey walkthrough](./flows/full-journey.md)
+| [scenarios/](./scenarios/) | Sample `ProjectContext` JSON |
+| [adrs/](./adrs/) | Example generated ADR markdown |
+| [flows/](./flows/) | [Full journey](./flows/full-journey.md) |
