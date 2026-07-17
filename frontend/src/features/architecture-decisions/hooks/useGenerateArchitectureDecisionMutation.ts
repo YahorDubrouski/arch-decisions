@@ -2,7 +2,7 @@ import {useRef} from 'react';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import {GenerateArchitectureDecisionRequest} from '@/domain/architectureDecision';
-import {generateArchitectureDecision} from '@/features/architecture-decisions/services/architectureDecisionService';
+import {architectureDecisionGateway} from '@/features/architecture-decisions/gateways/architectureDecisionGateway';
 import {isAbortError, resolveSubmitError} from '@/shared/api/httpClient';
 
 export function useGenerateArchitectureDecisionMutation() {
@@ -15,7 +15,7 @@ export function useGenerateArchitectureDecisionMutation() {
             abortControllerRef.current?.abort();
             const controller = new AbortController();
             abortControllerRef.current = controller;
-            return generateArchitectureDecision(request, controller.signal);
+            return architectureDecisionGateway.generate(request, controller.signal);
         },
         onSuccess: (architectureDecision) => {
             void queryClient.invalidateQueries({queryKey: ['architecture-decisions']});

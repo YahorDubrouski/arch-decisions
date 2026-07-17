@@ -1,7 +1,9 @@
 import type {
     ArchitectureDecision,
+    ArchitectureDecisionListFilters,
     ArchitectureDecisionListItem,
 } from '@/domain/architecture-decision.js';
+import {matchesArchitectureDecisionListFilters} from '@/domain/architecture-decision.js';
 import type {ArchitectureDecisionRepository} from './architecture-decision-repository.js';
 
 function toListItem(architectureDecision: ArchitectureDecision): ArchitectureDecisionListItem {
@@ -25,9 +27,10 @@ export class InMemoryArchitectureDecisionRepository implements ArchitectureDecis
         return this.records.get(id) ?? null;
     }
 
-    list(): ArchitectureDecisionListItem[] {
+    list(filters: ArchitectureDecisionListFilters = {}): ArchitectureDecisionListItem[] {
         return [...this.records.values()]
             .map(toListItem)
+            .filter((item) => matchesArchitectureDecisionListFilters(item, filters))
             .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
     }
 }

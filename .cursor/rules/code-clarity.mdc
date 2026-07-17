@@ -1,13 +1,14 @@
 ---
-description: Clarity first — readable code, comments for WHY, abstraction levels, obvious HTTP mapping
+description: Clarity first — readable code, comments for WHY / opaque HOW, abstraction levels, obvious HTTP mapping
 alwaysApply: true
 ---
 
 # Code clarity
 
 - **Readers first**: if a name needs a comment to understand, **rename** instead.
-- **Comments explain WHY**, not what the next line does. Use them for non-obvious constraints, API quirks, security, or performance trade-offs.
+- **Comments**: explain **why** (constraints, quirks, trade-offs) and, when the mechanics stay opaque, **what/how in plain language** — see [human-comments.mdc](./human-comments.mdc) (regex, backoff, workarounds).
+- Do **not** narrate obvious lines (`// set x to 1`).
 - **One level of abstraction per function**: if you can name a block with a phrase, extract a well-named private method.
 - **HTTP layer**: status codes and error shapes should be obvious from the method that sends them (e.g. `sendBadRequestForInvalidContext`).
 
-**Before finishing:** did we avoid abbreviations except industry-standard ones (`id`, `url`, `http`)? Is every comment justified by a *why* that would otherwise be lost?
+**Before finishing:** did we avoid abbreviations except industry-standard ones (`id`, `url`, `http`)? Are comments only where clarity would otherwise be lost?

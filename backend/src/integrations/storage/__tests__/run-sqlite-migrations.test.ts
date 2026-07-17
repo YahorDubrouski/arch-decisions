@@ -16,9 +16,19 @@ describe('runSqliteMigrations', () => {
         }
     });
 
-    it('skips migrations when storage provider is memory', async () => {
+    /**
+     * Given
+     * - Storage provider is configured for in-memory use.
+     * When
+     * - SQLite migrations are run.
+     * Then
+     * - Migrations are skipped without error.
+     */
+    it('when storage provider is memory then skip migrations', async () => {
+        // Arrange
         process.env.STORAGE_PROVIDER = 'memory';
 
+        // Act & Assert
         await expect(runSqliteMigrations()).resolves.toBeUndefined();
     });
 });
@@ -44,14 +54,36 @@ describe('create architecture_decisions migration', () => {
         }
     });
 
-    it('creates architecture_decisions on a fresh database', async () => {
+    /**
+     * Given
+     * - A fresh SQLite database with no tables.
+     * When
+     * - The architecture_decisions migration runs.
+     * Then
+     * - The architecture_decisions table exists and legacy adrs does not.
+     */
+    it('when database is fresh then create architecture_decisions table', async () => {
+        // Arrange
+        // Database is empty from beforeEach.
+
+        // Act
         await createArchitectureDecisionsTable(database);
 
+        // Assert
         expect(await database.schema.hasTable('architecture_decisions')).toBe(true);
         expect(await database.schema.hasTable('adrs')).toBe(false);
     });
 
-    it('is idempotent when architecture_decisions already exists and drops legacy adrs', async () => {
+    /**
+     * Given
+     * - architecture_decisions and legacy adrs tables already exist.
+     * When
+     * - The migration runs more than once.
+     * Then
+     * - architecture_decisions remains and legacy adrs is removed.
+     */
+    it('when tables already exist then stay idempotent and drop legacy adrs', async () => {
+        // Arrange
         await database.raw(`
             CREATE TABLE architecture_decisions (
                 id TEXT PRIMARY KEY,
@@ -73,9 +105,11 @@ describe('create architecture_decisions migration', () => {
             )
         `);
 
+        // Act & Assert
         await expect(createArchitectureDecisionsTable(database)).resolves.toBeUndefined();
         await expect(createArchitectureDecisionsTable(database)).resolves.toBeUndefined();
 
+        // Assert
         expect(await database.schema.hasTable('architecture_decisions')).toBe(true);
         expect(await database.schema.hasTable('adrs')).toBe(false);
     });

@@ -1,19 +1,25 @@
 import {asClass, asFunction, createContainer, InjectionMode} from 'awilix';
-import {DecisionsController} from '@/controllers/decisions.controller.js';
+import {RecommendationsController} from '@/controllers/recommendations.controller.js';
 import {ArchitectureDecisionsController} from '@/controllers/architecture-decisions.controller.js';
-import {EvaluateDecisionsService} from '@/services/decisions/evaluate-decisions.service.js';
+import {JobsController} from '@/controllers/jobs.controller.js';
+import {EvaluateRecommendationsService} from '@/services/recommendations/evaluate-recommendations.service.js';
 import {GenerateArchitectureDecisionService} from '@/services/architecture-decisions/generate-architecture-decision.service.js';
-import type {DecisionProvider} from '@/services/decisions/decision-provider.js';
+import {EnqueueArchitectureJobService} from '@/services/jobs/enqueue-architecture-job.service.js';
+import {GetArchitectureJobService} from '@/services/jobs/get-architecture-job.service.js';
+import type {RecommendationProvider} from '@/services/recommendations/recommendation-provider.js';
 import type {ArchitectureDecisionGenerator} from '@/services/architecture-decisions/architecture-decision-generator.js';
 import type {ArchitectureDecisionRepository} from '@/integrations/storage/architecture-decision-repository.js';
-import {OpenAIDecisionsProvider} from '@/integrations/openai/openai-decisions.provider.js';
+import {createRecommendationProvider} from '@/integrations/openai/recommendation-provider.factory.js';
 import {createArchitectureDecisionGeneratorProvider} from '@/integrations/openai/architecture-decision-provider.factory.js';
 import {createArchitectureDecisionRepository} from '@/integrations/storage/architecture-decision-repository.factory.js';
 
 export interface AppCradle {
-    decisionProvider: DecisionProvider;
-    evaluateDecisionsService: EvaluateDecisionsService;
-    decisionsController: DecisionsController;
+    recommendationProvider: RecommendationProvider;
+    evaluateRecommendationsService: EvaluateRecommendationsService;
+    enqueueArchitectureJobService: EnqueueArchitectureJobService;
+    getArchitectureJobService: GetArchitectureJobService;
+    recommendationsController: RecommendationsController;
+    jobsController: JobsController;
     architectureDecisionRepository: ArchitectureDecisionRepository;
     architectureDecisionGenerator: ArchitectureDecisionGenerator;
     generateArchitectureDecisionService: GenerateArchitectureDecisionService;
@@ -24,9 +30,12 @@ export function createAppContainer() {
     return createContainer<AppCradle>({
         injectionMode: InjectionMode.CLASSIC,
     }).register({
-        decisionProvider: asClass(OpenAIDecisionsProvider).singleton(),
-        evaluateDecisionsService: asClass(EvaluateDecisionsService).singleton(),
-        decisionsController: asClass(DecisionsController).singleton(),
+        recommendationProvider: asFunction(createRecommendationProvider).singleton(),
+        evaluateRecommendationsService: asClass(EvaluateRecommendationsService).singleton(),
+        enqueueArchitectureJobService: asClass(EnqueueArchitectureJobService).singleton(),
+        getArchitectureJobService: asClass(GetArchitectureJobService).singleton(),
+        recommendationsController: asClass(RecommendationsController).singleton(),
+        jobsController: asClass(JobsController).singleton(),
         architectureDecisionRepository: asFunction(createArchitectureDecisionRepository).singleton(),
         architectureDecisionGenerator: asFunction(createArchitectureDecisionGeneratorProvider).singleton(),
         generateArchitectureDecisionService: asClass(GenerateArchitectureDecisionService).singleton(),

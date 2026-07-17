@@ -1,13 +1,14 @@
 import {FormEvent} from 'react';
 import {isContextComplete} from '@/domain/context';
 import {useContextForm} from '@/features/context/hooks/useContextForm';
-import {useEvaluateDecisionsMutation} from '@/features/context/hooks/useEvaluateDecisionsMutation';
+import {useEvaluateRecommendationsMutation} from '@/features/context/hooks/useEvaluateRecommendationsMutation';
 import {Step1TeamSize} from '@/features/context/components/Step1TeamSize';
 import {Step2TrafficPattern} from '@/features/context/components/Step2TrafficPattern';
 import {Step3BudgetSensitivity} from '@/features/context/components/Step3BudgetSensitivity';
 import {Step4ComplianceRequirements} from '@/features/context/components/Step4ComplianceRequirements';
 import {Step5OperationalMaturity} from '@/features/context/components/Step5OperationalMaturity';
 import {StepProgress} from '@/features/context/components/StepProgress';
+import {PageVisualAccent} from '@/shared/brand/PageVisualAccent';
 import {ErrorState} from '@/shared/ui/ErrorState';
 import {ContextIcon} from '@/shared/ui/icons/Icons';
 import ui from '@/shared/styles/ui.module.css';
@@ -25,7 +26,7 @@ export function ContextBuilderPage() {
     const {context, updateContext, currentStep, nextStep, previousStep, errors, canSubmit} =
         useContextForm();
     const {submit, cancel, isSubmitting, submitError, resetSubmitError} =
-        useEvaluateDecisionsMutation();
+        useEvaluateRecommendationsMutation();
 
     function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -46,15 +47,19 @@ export function ContextBuilderPage() {
     return (
         <div className={`${ui.pagePanel} ${styles.page}`}>
             <header className={styles.pageHeader}>
-                <span className={ui.pageIconWrap}>
-                    <ContextIcon size={22}/>
-                </span>
-                <div>
-                    <h1 className={ui.pageTitle}>Project context</h1>
-                    <p className={ui.pageLead}>
-                        Define constraints that drive compute, security, and delivery recommendations.
-                    </p>
+                <div className={styles.headerCopy}>
+                    <span className={ui.pageIconWrap}>
+                        <ContextIcon size={22}/>
+                    </span>
+                    <div>
+                        <h1 className={ui.pageTitle}>Project context</h1>
+                        <p className={ui.pageLead}>
+                            Define constraints that drive compute, security, and delivery
+                            recommendations.
+                        </p>
+                    </div>
                 </div>
+                <PageVisualAccent variant="context"/>
             </header>
 
             <StepProgress
@@ -117,7 +122,7 @@ export function ContextBuilderPage() {
                     ) : (
                         <>
                             <button type="submit" className={ui.btnPrimary} disabled={!canSubmit || isSubmitting}>
-                                {isSubmitting ? 'Submitting…' : 'Evaluate decisions'}
+                                {isSubmitting ? 'Submitting…' : 'Evaluate recommendations'}
                             </button>
                             {isSubmitting && (
                                 <button type="button" className={ui.btnGhost} onClick={cancel}>

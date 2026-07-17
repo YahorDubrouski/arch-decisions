@@ -19,7 +19,12 @@ services:
     # Override: Use localhost for API URL in dev
     environment:
       - VITE_API_URL=http://localhost:3001
+      - VITE_DATA_SOURCE=http
 
   backend:
     # Override: Use tsx watch for hot reload
     command: npm run dev
+
+  worker:
+    # Override: tsx watch so source mounts are live (base Dockerfile still builds dist for start)
+    command: npm run worker:dev

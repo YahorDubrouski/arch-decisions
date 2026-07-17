@@ -1,0 +1,64 @@
+---
+description: Test structure comments and business-facing test documentation
+globs: "**/{**/__tests__/**,**/test/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx}"
+alwaysApply: false
+---
+
+# Test comments and documentation
+
+## Test structure — Arrange / Act / Assert
+
+Every test must have `// Arrange`, `// Act`, `// Assert` comments. Keep them in that order (`expect(...).toThrow` / `rejects` setup goes before Act when needed).
+
+```ts
+it('returns EC2 for small cost-optimized teams', async () => {
+  // Arrange
+  const context = buildProjectContext({
+    teamSize: '1-5',
+    budgetSensitivity: 'cost-optimized',
+  });
+
+  // Act
+  const result = await provider.evaluateAll(context);
+
+  // Assert
+  expect(result.compute.recommended).toBe('EC2');
+});
+```
+
+## Business logic as documentation
+
+- **File / describe docblock** (when useful): list the business rules under test (bullet list).
+- **Test docblock**: use short `Given / When / Then` blocks.
+- **Test name**: describe the business rule, not the implementation.
+- **Assertion messages** (when the expectation is non-obvious): state the business outcome, not only the technical check.
+- **Given block**: input data and preconditions only (no actions).
+- **When block**: one business action.
+- **Then block**: expected business outcome in plain language.
+
+```ts
+/**
+ * Given
+ * - Team size is 1-5 and budget is cost-optimized.
+ * When
+ * - Recommendations are evaluated.
+ * Then
+ * - Compute recommendation is EC2.
+ */
+it('when team is small and cost-optimized then recommend EC2', async () => {
+  // Arrange
+  // Act
+  // Assert
+});
+```
+
+```ts
+// ❌ BAD — name describes internals, not the business rule
+it('calls evaluateAll and checks compute.recommended', async () => {});
+```
+
+## Test naming from docblock
+
+- Derive test names from `When` + `Then` in the method docblock when both exist.
+- Prefer pattern: `when_<condition>_then_<business_outcome>` (Jest/Vitest `it(...)` string).
+- Keep names concise, behavior-focused, and readable by non-technical stakeholders.

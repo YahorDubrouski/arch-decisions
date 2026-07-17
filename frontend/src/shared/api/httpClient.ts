@@ -19,6 +19,8 @@ export type JsonRequestOptions = {
     signal?: AbortSignal;
 };
 
+// Browsers may throw AbortError as DOMException or as a plain Error with the same name.
+// Example: DOMException name "AbortError" → true; TypeError "Failed to fetch" → false.
 export function isAbortError(error: unknown): boolean {
     return (
         (error instanceof DOMException && error.name === 'AbortError') ||
@@ -62,6 +64,8 @@ export function resolveSubmitError(error: unknown): string {
         return 'Received an invalid response from the server.';
     }
 
+    // fetch turns “no network / server down” into TypeError or the literal "Failed to fetch".
+    // Example: Error("Failed to fetch") → "Could not reach the server…"; HttpClientError(400) → that message.
     if (error instanceof TypeError || (error instanceof Error && error.message === 'Failed to fetch')) {
         return 'Could not reach the server. Check that backend is running.';
     }

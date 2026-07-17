@@ -13,10 +13,17 @@ A four-step user journey:
 
 1. **Home** — entry and workflow overview  
 2. **Context** (`/context`) — 5-step wizard, validated form state  
-3. **Decisions** (`/decisions`) — read recommendations from session + generate ADR  
+3. **Recommendations** (`/recommendations`) — read recommendations from session + generate ADR  
 4. **ADR viewer** (`/architecture-decisions/:id`) — summary/full toggle, copy, download  
 
 Pages are thin; business UI lives in **feature folders**.
+
+### UI showcase
+
+| | |
+|-|-|
+| ![Home](./docs/screenshots/01-home.png) | ![Recommendations](./docs/screenshots/03-recommendations.png) |
+| ![Documents](./docs/screenshots/04-documents-grid.png) | ![ADR](./docs/screenshots/06-adr-full.png) |
 
 ---
 
@@ -28,10 +35,10 @@ frontend/src/
 ├── pages/            # Route screens — compose features only
 ├── features/         # One folder per user flow
 │   ├── context/
-│   ├── decisions/
-│   └── architecture-decisions/
+│   ├── recommendations/          # + gateways/ (Http | Local)
+│   └── architecture-decisions/   # + gateways/, seed/
 ├── domain/           # Zod schemas + pure validation (no React, no fetch)
-└── shared/           # Layout, API client, design tokens, icons
+└── shared/           # Layout, API client, config (`dataSource`), design tokens
 ```
 
 **Why this layout**
@@ -39,15 +46,16 @@ frontend/src/
 | Choice | Rationale |
 |--------|-----------|
 | `pages/` stay thin | Routes change rarely; features evolve independently |
-| `features/<name>/` | High cohesion — components, hooks, and services for one flow live together |
+| `features/<name>/` | High cohesion — components, hooks, and gateways for one flow live together |
+| `gateways/` | Port + adapters: UI depends on a stable interface; `http` vs `local` is a factory choice |
 | `domain/` is framework-free | Validation rules are testable without rendering or HTTP mocks |
 | `shared/` for cross-cutting only | Prevents a junk-drawer `components/` that every feature imports |
 
 **Example — page as composer, not logic owner:**
 
 ```tsx
-// pages/DecisionsPage.tsx — reads session, delegates actions to hooks
-const decisions = getDecisions();
+// pages/RecommendationsPage.tsx — reads session, delegates actions to hooks
+const recommendations = getRecommendations();
 const { submit, isSubmitting, submitError } = useGenerateArchitectureDecisionMutation();
 ```
 
@@ -62,8 +70,8 @@ We did **not** add Redux or Zustand. State is split by **lifetime** and **source
 | Layer | Tool | Holds | Example |
 |-------|------|-------|---------|
 | **UI / form** | `useState` in feature hooks | Wizard step, field values, inline errors | `useContextForm` |
-| **Server** | TanStack Query | API data, loading, error, cache | `useArchitectureDecisionQuery` |
-| **Session** | `sessionStorage` via feature services | Context + decisions between routes | `contextStorage`, `decisionsStorage` |
+| **Server / remote** | TanStack Query + gateways | API (or local adapter) data, loading, error, cache | `useArchitectureDecisionQuery` → `architectureDecisionGateway` |
+| **Session** | `sessionStorage` via feature storage | Context + recommendations between routes | `contextStorage`, `recommendationsStorage` |
 
 ### Why not Redux?
 
@@ -96,13 +104,13 @@ function nextStep() {
 **Server state — mutation with side effects:**
 
 ```tsx
-// features/context/hooks/useEvaluateDecisionsMutation.ts
+// features/context/hooks/useEvaluateRecommendationsMutation.ts
 const mutation = useMutation({
-  mutationFn: (context: ProjectContext) => evaluateDecisions(context),
-  onSuccess: (decisions, context) => {
+  mutationFn: (context: ProjectContext) => recommendationsGateway.evaluateAll(context),
+  onSuccess: (recommendations, context) => {
     saveProjectContext(context);
-    saveDecisions(decisions);
-    navigate('/decisions');
+    saveRecommendations(recommendations);
+    navigate('/recommendations');
   },
 });
 ```
@@ -110,8 +118,8 @@ const mutation = useMutation({
 **Session read with schema guard:**
 
 ```tsx
-// features/decisions/services/decisionsStorage.ts
-const parsed = decisionsResponseSchema.safeParse(JSON.parse(rawValue));
+// features/recommendations/services/recommendationsStorage.ts
+const parsed = recommendationsResponseSchema.safeParse(JSON.parse(rawValue));
 return parsed.success ? parsed.data : null;
 ```
 
@@ -157,7 +165,7 @@ Competency **13** (separation): domain, infrastructure, and UI are import-direct
 // features/architecture-decisions/hooks/useArchitectureDecisionQuery.ts
 return useQuery({
   queryKey: ['architecture-decision', decisionId],
-  queryFn: () => fetchArchitectureDecisionById(decisionId!),
+  queryFn: () => architectureDecisionGateway.getById(decisionId!),
   enabled: Boolean(decisionId),
 });
 ```
@@ -166,7 +174,7 @@ Pages branch on `isLoading`, `isError`, and `data` — no ad-hoc `useEffect` fet
 
 ### Mutations (write)
 
-`useEvaluateDecisionsMutation` and `useGenerateArchitectureDecisionMutation` expose:
+`useEvaluateRecommendationsMutation` and `useGenerateArchitectureDecisionMutation` expose:
 
 - `isSubmitting` / `isPending` for button disabled state  
 - `submitError` mapped through `resolveSubmitError`  
@@ -207,7 +215,7 @@ Competency **14** (async orchestration): loading/error/retry are first-class in 
 ```tsx
 // app/routes.tsx
 <Route path="/context" element={<ContextBuilderPage/>}/>
-<Route path="/decisions" element={<DecisionsPage/>}/>
+<Route path="/recommendations" element={<RecommendationsPage/>}/>
 <Route path="/architecture-decisions/:decisionId" element={<ArchitectureDecisionPage/>}/>
 ```
 
@@ -257,7 +265,7 @@ Tests run in Docker: `docker-compose ... exec frontend npm run test` (74 tests).
 **What we deliberately skipped** (portfolio scope)
 
 - `useMemo` / `useCallback` everywhere — list sizes are tiny; premature  
-- Code splitting / lazy routes — four pages; bundle is already small  
+- Code splitting / lazy routes — each page in `app/routes.tsx` is `React.lazy`’d with `Suspense` + `PageFallback` (code load ≠ API load)
 - Virtualized ADR rendering — documents are short markdown strings  
 
 Competencies **15–16**: maintainability via structure and boundaries, not micro-optimizations.
@@ -271,9 +279,9 @@ Competencies **15–16**: maintainability via structure and boundaries, not micr
 | 11 | React application architecture | `app/`, `pages/`, `features/`, `domain/`, `shared/` |
 | 12 | State management strategy | `useContextForm`, TanStack Query, `*Storage` services |
 | 13 | Separation of concerns | Domain schemas, feature services, thin pages |
-| 14 | Async orchestration | `useEvaluateDecisionsMutation`, `useArchitectureDecisionQuery`, `httpClient` |
+| 14 | Async orchestration | `useEvaluateRecommendationsMutation`, `useArchitectureDecisionQuery`, `httpClient` |
 | 15 | Scalability / maintainability | Feature-based folders, co-located tests, CSS Modules |
-| 16 | Performance-aware patterns | Query cache, scoped CSS, intentional omission of premature memoization |
+| 16 | Performance-aware patterns | Query cache; route-level `lazy`/`Suspense` in `app/routes.tsx`; no premature memoization |
 | 17 | Clear reasoning WHY | This document + [COMPETENCY_MAP.md](./docs/COMPETENCY_MAP.md) |
 
 ---
@@ -281,11 +289,42 @@ Competencies **15–16**: maintainability via structure and boundaries, not micr
 ## Key files to read first
 
 1. `frontend/src/app/App.tsx` — providers + shell  
-2. `frontend/src/features/context/hooks/useContextForm.ts` — local form state  
-3. `frontend/src/features/context/hooks/useEvaluateDecisionsMutation.ts` — mutation + persistence  
-4. `frontend/src/pages/DecisionsPage.tsx` — composing session + mutation  
-5. `frontend/src/shared/api/httpClient.ts` — HTTP + error mapping  
-6. `frontend/src/domain/contextSchema.ts` — domain validation  
+2. `frontend/src/shared/config/dataSource.ts` — `VITE_DATA_SOURCE` selection  
+3. `frontend/src/features/recommendations/gateways/` — port + Http/Local adapters  
+4. `frontend/src/features/architecture-decisions/gateways/` — port + Http/Local adapters  
+5. `frontend/src/features/context/hooks/useEvaluateRecommendationsMutation.ts` — mutation via gateway  
+6. `frontend/src/shared/api/httpClient.ts` — HTTP + error mapping  
+7. `frontend/src/domain/contextSchema.ts` — domain validation  
+
+---
+
+## Data source strategy (`VITE_DATA_SOURCE`)
+
+Hooks call feature **gateways**. The factory reads env once:
+
+```txt
+VITE_DATA_SOURCE=http|local  (default: http)
+
+hooks → recommendationsGateway / architectureDecisionGateway
+     → create*Gateway(getDataSource())
+     → Http*Gateway  |  Local*Gateway
+```
+
+| Mode | Recommendations | Architecture decisions |
+|------|-----------------|------------------------|
+| `http` | `POST /api/recommendations/evaluate` → `202` + poll `GET /api/jobs/:jobId` | Same async pattern for generate; sync list/get |
+| `local` | In-browser rules (same as backend mock) | Template ADR + `sessionStorage` list/get; seeds demo docs when empty |
+
+Future remote backends (any language) only need the same HTTP JSON contract — the `Http*Gateway` stays unchanged.
+
+**Example — Compose env:**
+
+```yaml
+# docker-compose.dev.yml
+environment:
+  - VITE_API_URL=http://localhost:3001
+  - VITE_DATA_SOURCE=http   # or local for frontend-only demos
+```
 
 ---
 
@@ -299,7 +338,8 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 cd frontend && npm install && npm run dev
 ```
 
-Set `VITE_API_URL` when the backend runs on a different origin (default: same-origin / Vite proxy).
+- `VITE_API_URL` — backend origin when using `http` (default: same-origin / Vite proxy)
+- `VITE_DATA_SOURCE` — `http` (default) or `local`
 
 ---
 

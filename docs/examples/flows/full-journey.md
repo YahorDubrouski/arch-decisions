@@ -1,6 +1,20 @@
-# Full journey: context → decisions → architecture decision record
+# Full journey: context → recommendations → architecture decision record
 
 This walkthrough mirrors the UI flow and shows how structured input becomes documented output.
+
+## Visual tour
+
+![Home](../../screenshots/01-home.png)
+
+![Context builder](../../screenshots/02-context.png)
+
+![Recommendations](../../screenshots/03-recommendations.png)
+
+![Documents grid](../../screenshots/04-documents-grid.png)
+
+![ADR summary](../../screenshots/05-adr-summary.png)
+
+![ADR full document](../../screenshots/06-adr-full.png)
 
 ## 1. Define project context
 
@@ -20,12 +34,12 @@ This walkthrough mirrors the UI flow and shows how structured input becomes docu
 
 **What happens:**
 - User completes the 5-step wizard (team, traffic, budget, compliance, maturity).
-- On submit, the frontend calls `POST /api/decisions/evaluate` with the context.
-- Context and decisions are stored in `sessionStorage` for the current browser session.
+- On submit, the frontend calls `POST /api/recommendations/evaluate` with the context.
+- Context and recommendations are stored in `sessionStorage` for the current browser session.
 
-## 2. Review architecture decisions
+## 2. Review recommendations
 
-**Route:** `/decisions`
+**Route:** `/recommendations`
 
 **Representative output** (rule-based evaluation; production may use OpenAI with the same contract):
 
@@ -39,14 +53,14 @@ Each category card shows alternatives and trade-offs (cost, complexity, risk, op
 
 ## 3. Generate architecture decision document
 
-**Action:** Click **Generate architecture decision** on `/decisions`.
+**Action:** Click **Generate architecture decision** on `/recommendations`.
 
 **API:** `POST /api/architecture-decisions/generate`
 
 ```json
 {
   "context": { "...": "same as step 1" },
-  "decisions": {
+  "recommendations": {
     "compute": { "category": "compute", "recommended": "EC2", "...": "..." },
     "secrets": { "...": "..." },
     "cicd": { "...": "..." }
@@ -78,15 +92,15 @@ Each category card shows alternatives and trade-offs (cost, complexity, risk, op
 ## API quick reference
 
 ```bash
-# Evaluate decisions (use the "context" object from a scenario file)
-curl -s -X POST http://localhost:3001/api/decisions/evaluate \
+# Evaluate recommendations (use the "context" object from a scenario file)
+curl -s -X POST http://localhost:3001/api/recommendations/evaluate \
   -H 'Content-Type: application/json' \
   -d '{"context":{"teamSize":"1-5","trafficPattern":"low-steady","budgetSensitivity":"cost-optimized","complianceRequirements":[],"operationalMaturity":"minimal"}}'
 
-# Generate ADR (requires full request body with context + decisions from evaluate)
+# Generate ADR (requires full request body with context + recommendations from evaluate)
 curl -s -X POST http://localhost:3001/api/architecture-decisions/generate \
   -H 'Content-Type: application/json' \
-  -d '{ "context": {...}, "decisions": {...} }'
+  -d '{ "context": {...}, "recommendations": {...} }'
 
 # Fetch generated ADR
 curl -s http://localhost:3001/api/architecture-decisions/{decisionId}

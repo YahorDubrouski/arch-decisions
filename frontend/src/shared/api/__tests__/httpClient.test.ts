@@ -4,32 +4,57 @@ import {HttpClientError, resolveSubmitError} from '../httpClient';
 
 describe('resolveSubmitError', () => {
     it('returns friendly message for server errors', () => {
+        // Arrange
         const error = new HttpClientError('Internal server error', 500);
 
-        expect(resolveSubmitError(error)).toBe('Server error. Please try again.');
+        // Act
+        const message = resolveSubmitError(error);
+
+        // Assert
+        expect(message).toBe('Server error. Please try again.');
     });
 
     it('returns backend message for client errors', () => {
+        // Arrange
         const error = new HttpClientError('Invalid context: teamSize is required', 400);
 
-        expect(resolveSubmitError(error)).toBe('Invalid context: teamSize is required');
+        // Act
+        const message = resolveSubmitError(error);
+
+        // Assert
+        expect(message).toBe('Invalid context: teamSize is required');
     });
 
     it('returns network message for fetch failures', () => {
-        expect(resolveSubmitError(new TypeError('Failed to fetch'))).toBe(
-            'Could not reach the server. Check that backend is running.'
-        );
+        // Arrange
+        const error = new TypeError('Failed to fetch');
+
+        // Act
+        const message = resolveSubmitError(error);
+
+        // Assert
+        expect(message).toBe('Could not reach the server. Check that backend is running.');
     });
 
     it('returns friendly message for invalid API response shape', () => {
-        expect(resolveSubmitError(new z.ZodError([]))).toBe(
-            'Received an invalid response from the server.'
-        );
+        // Arrange
+        const error = new z.ZodError([]);
+
+        // Act
+        const message = resolveSubmitError(error);
+
+        // Assert
+        expect(message).toBe('Received an invalid response from the server.');
     });
 
     it('returns cancel message for abort errors', () => {
-        expect(resolveSubmitError(new DOMException('Aborted', 'AbortError'))).toBe(
-            'Request cancelled.'
-        );
+        // Arrange
+        const error = new DOMException('Aborted', 'AbortError');
+
+        // Act
+        const message = resolveSubmitError(error);
+
+        // Assert
+        expect(message).toBe('Request cancelled.');
     });
 });

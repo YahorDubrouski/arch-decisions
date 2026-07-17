@@ -15,6 +15,15 @@ export function createKnexConfig(): Knex.Config {
             filename: getDatabasePath(),
         },
         useNullAsDefault: true,
+        pool: {
+            afterCreate(connection: {pragma: (sql: string) => unknown}, done: (error: Error | null, connection: unknown) => void): void {
+                // Shared SQLite file is opened by API + worker; wait briefly instead of hanging forever.
+                // Example: other process holds the lock → wait up to 5s, then fail; WAL lets readers/writers overlap.
+                connection.pragma('journal_mode = WAL');
+                connection.pragma('busy_timeout = 5000');
+                done(null, connection);
+            },
+        },
         migrations: {
             directory: getMigrationsDirectory(),
             extension: 'ts',

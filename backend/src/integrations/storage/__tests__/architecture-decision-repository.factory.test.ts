@@ -13,27 +13,60 @@ describe('createArchitectureDecisionRepository', () => {
         }
     });
 
-    it('creates sqlite repository by default', () => {
+    /**
+     * Given
+     * - STORAGE_PROVIDER is unset.
+     * When
+     * - The architecture decision repository is created.
+     * Then
+     * - A SQLite repository is returned.
+     */
+    it('when storage provider is unset then create sqlite repository', () => {
+        // Arrange
         delete process.env.STORAGE_PROVIDER;
 
+        // Act
         const repository = createArchitectureDecisionRepository();
 
+        // Assert
         expect(repository).toBeInstanceOf(SqliteArchitectureDecisionRepository);
     });
 
-    it('creates sqlite repository when STORAGE_PROVIDER is sqlite', () => {
+    /**
+     * Given
+     * - STORAGE_PROVIDER is sqlite.
+     * When
+     * - The architecture decision repository is created.
+     * Then
+     * - A SQLite repository is returned.
+     */
+    it('when storage provider is sqlite then create sqlite repository', () => {
+        // Arrange
         process.env.STORAGE_PROVIDER = 'sqlite';
 
+        // Act
         const repository = createArchitectureDecisionRepository();
 
+        // Assert
         expect(repository).toBeInstanceOf(SqliteArchitectureDecisionRepository);
     });
 
-    it('creates in-memory repository when STORAGE_PROVIDER is memory', () => {
+    /**
+     * Given
+     * - STORAGE_PROVIDER is memory.
+     * When
+     * - The architecture decision repository is created.
+     * Then
+     * - An in-memory repository is returned.
+     */
+    it('when storage provider is memory then create in-memory repository', () => {
+        // Arrange
         process.env.STORAGE_PROVIDER = 'memory';
 
+        // Act
         const repository = createArchitectureDecisionRepository();
 
+        // Assert
         expect(repository).toBeInstanceOf(InMemoryArchitectureDecisionRepository);
     });
 });

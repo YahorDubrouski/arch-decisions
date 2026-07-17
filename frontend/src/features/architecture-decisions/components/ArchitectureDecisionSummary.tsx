@@ -1,4 +1,6 @@
-import styles from './ArchitectureDecisionSummary.module.css';
+import ReactMarkdown from 'react-markdown';
+import {formatArchitectureDecisionSummaryMarkdown} from '@/features/architecture-decisions/domain/formatArchitectureDecisionSummaryMarkdown';
+import documentStyles from './ArchitectureDecisionFull.module.css';
 
 type ArchitectureDecisionSummaryProps = {
     summary: string;
@@ -6,10 +8,8 @@ type ArchitectureDecisionSummaryProps = {
 
 export function ArchitectureDecisionSummary({summary}: ArchitectureDecisionSummaryProps) {
     return (
-        <section className={styles.summary} aria-label="Architecture decision summary">
-            {summary.split('\n').map((line, index) => (
-                <p key={`${index}-${line}`}>{line}</p>
-            ))}
-        </section>
+        <article className={documentStyles.document} aria-label="Architecture decision summary">
+            <ReactMarkdown>{formatArchitectureDecisionSummaryMarkdown(summary)}</ReactMarkdown>
+        </article>
     );
 }

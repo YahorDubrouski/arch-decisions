@@ -5,6 +5,8 @@ export async function copyArchitectureDecisionText(text: string): Promise<void> 
 }
 
 function toDownloadFileName(title: string): string {
+    // Turn the title into a safe download name: keep letters/digits, replace the rest with "-".
+    // Example: "My ADR!" → "my-adr.md"; "---" → "architecture-decision.md".
     const normalizedTitle = title.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     return `${normalizedTitle || 'architecture-decision'}.md`;
 }

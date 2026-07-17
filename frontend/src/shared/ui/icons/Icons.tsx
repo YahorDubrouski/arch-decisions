@@ -27,7 +27,7 @@ export function ContextIcon({size = defaultSize, className}: IconProps) {
     );
 }
 
-export function DecisionsIcon({size = defaultSize, className}: IconProps) {
+export function RecommendationsIcon({size = defaultSize, className}: IconProps) {
     return (
         <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M6 7h12M6 12h12M6 17h8" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round"/>
@@ -119,7 +119,7 @@ export function ArrowRightIcon({size = defaultSize, className}: IconProps) {
     );
 }
 
-export function EmptyDecisionsIcon({size = 48, className}: IconProps) {
+export function EmptyRecommendationsIcon({size = 48, className}: IconProps) {
     return (
         <svg className={className} width={size} height={size} viewBox="0 0 64 64" fill="none" aria-hidden="true">
             <rect x="12" y="10" width="40" height="44" rx="4" stroke="currentColor" strokeWidth="2"/>

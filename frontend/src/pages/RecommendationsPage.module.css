@@ -1,0 +1,29 @@
+.page {
+    margin-top: 0;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+    gap: var(--spacing-lg);
+    align-items: stretch;
+    margin-bottom: var(--spacing-xl);
+}
+
+.headerCopy {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 840px) {
+    .header {
+        grid-template-columns: 1fr;
+    }
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--spacing-lg);
+}

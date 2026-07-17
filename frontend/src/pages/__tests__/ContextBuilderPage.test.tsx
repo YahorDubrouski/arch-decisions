@@ -2,13 +2,13 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {render, screen, waitFor} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {ProjectContext} from '@/domain/context';
-import {DecisionsResponse} from '@/domain/decisions';
+import {RecommendationsResponse} from '@/domain/recommendations';
 import {renderWithProviders} from '@/test/renderWithProviders';
 import {ContextBuilderPage} from '../ContextBuilderPage';
 
 const mockNavigate = vi.fn();
-const mockEvaluateDecisions = vi.fn();
-const mockSaveDecisions = vi.fn();
+const mockEvaluateRecommendations = vi.fn();
+const mockSaveRecommendations = vi.fn();
 
 const completeContext: ProjectContext = {
     teamSize: '6-20',
@@ -18,7 +18,7 @@ const completeContext: ProjectContext = {
     operationalMaturity: 'moderate',
 };
 
-const sampleDecisions: DecisionsResponse = {
+const sampleRecommendations: RecommendationsResponse = {
     compute: {
         category: 'compute',
         recommended: 'ECS',
@@ -74,12 +74,14 @@ vi.mock('@/features/context/hooks/useContextForm', () => ({
     }),
 }));
 
-vi.mock('@/features/context/services/decisionsService', () => ({
-    evaluateDecisions: (...args: unknown[]) => mockEvaluateDecisions(...args),
+vi.mock('@/features/recommendations/gateways/recommendationsGateway', () => ({
+    recommendationsGateway: {
+        evaluateAll: (...args: unknown[]) => mockEvaluateRecommendations(...args),
+    },
 }));
 
-vi.mock('@/features/decisions/services/decisionsStorage', () => ({
-    saveDecisions: (...args: unknown[]) => mockSaveDecisions(...args),
+vi.mock('@/features/recommendations/services/recommendationsStorage', () => ({
+    saveRecommendations: (...args: unknown[]) => mockSaveRecommendations(...args),
 }));
 
 describe('ContextBuilderPage submit', () => {
@@ -87,55 +89,88 @@ describe('ContextBuilderPage submit', () => {
         vi.clearAllMocks();
     });
 
+    /**
+     * Given
+     * - Evaluation is in progress after submit.
+     * When
+     * - The user clicks Evaluate recommendations.
+     * Then
+     * - Submit and back controls are disabled until navigation succeeds.
+     */
     it('shows submitting state while evaluation is in progress', async () => {
+        // Arrange
         const user = userEvent.setup();
-        let resolveEvaluation: (value: DecisionsResponse) => void = () => undefined;
-        mockEvaluateDecisions.mockImplementation(
+        let resolveEvaluation: (value: RecommendationsResponse) => void = () => undefined;
+        mockEvaluateRecommendations.mockImplementation(
             () =>
-                new Promise<DecisionsResponse>((resolve) => {
+                new Promise<RecommendationsResponse>((resolve) => {
                     resolveEvaluation = resolve;
                 })
         );
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
+        // Act
+        await user.click(screen.getByRole('button', {name: 'Evaluate recommendations'}));
 
+        // Assert
         expect(screen.getByRole('button', {name: 'Submitting…'})).toBeDisabled();
         expect(screen.getByRole('button', {name: 'Back'})).toBeDisabled();
 
-        resolveEvaluation(sampleDecisions);
+        resolveEvaluation(sampleRecommendations);
 
         await waitFor(() => {
-            expect(mockNavigate).toHaveBeenCalledWith('/decisions');
+            expect(mockNavigate).toHaveBeenCalledWith('/recommendations');
         });
     });
 
+    /**
+     * Given
+     * - Recommendation evaluation fails with a network error.
+     * When
+     * - The user submits the context form.
+     * Then
+     * - An alert is shown and navigation does not occur.
+     */
     it('shows error message when evaluation fails', async () => {
+        // Arrange
         const user = userEvent.setup();
-        mockEvaluateDecisions.mockRejectedValue(new TypeError('Failed to fetch'));
+        mockEvaluateRecommendations.mockRejectedValue(new TypeError('Failed to fetch'));
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
+        // Act
+        await user.click(screen.getByRole('button', {name: 'Evaluate recommendations'}));
 
+        // Assert
         expect(
             await screen.findByRole('alert')
         ).toHaveTextContent('Could not reach the server. Check that backend is running.');
         expect(mockNavigate).not.toHaveBeenCalled();
     });
 
-    it('navigates to decisions page after successful evaluation', async () => {
+    /**
+     * Given
+     * - Recommendation evaluation succeeds.
+     * When
+     * - The user submits the context form.
+     * Then
+     * - Recommendations are saved and the app navigates to the results page.
+     */
+    it('navigates to recommendations page after successful evaluation', async () => {
+        // Arrange
         const user = userEvent.setup();
-        mockEvaluateDecisions.mockResolvedValue(sampleDecisions);
+        mockEvaluateRecommendations.mockResolvedValue(sampleRecommendations);
 
         renderWithProviders(<ContextBuilderPage/>);
 
-        await user.click(screen.getByRole('button', {name: 'Evaluate decisions'}));
+        // Act
+        await user.click(screen.getByRole('button', {name: 'Evaluate recommendations'}));
 
+        // Assert
         await waitFor(() => {
-            expect(mockSaveDecisions).toHaveBeenCalledWith(sampleDecisions);
-            expect(mockNavigate).toHaveBeenCalledWith('/decisions');
+            expect(mockSaveRecommendations).toHaveBeenCalledWith(sampleRecommendations);
+            expect(mockNavigate).toHaveBeenCalledWith('/recommendations');
         });
     });
 });

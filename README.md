@@ -55,6 +55,24 @@ decisions (like which cloud services to use) with explanations of why and what t
 
 ---
 
+## UI showcase
+
+| Home | Context wizard |
+|------|----------------|
+| ![Home](./docs/screenshots/01-home.png) | ![Context](./docs/screenshots/02-context.png) |
+
+| Recommendations | Documents grid |
+|-----------------|----------------|
+| ![Recommendations](./docs/screenshots/03-recommendations.png) | ![Documents](./docs/screenshots/04-documents-grid.png) |
+
+| ADR summary | ADR full document |
+|-------------|-------------------|
+| ![ADR summary](./docs/screenshots/05-adr-summary.png) | ![ADR full](./docs/screenshots/06-adr-full.png) |
+
+More detail: [docs/screenshots/](./docs/screenshots/) · [full journey walkthrough](./docs/examples/flows/full-journey.md)
+
+---
+
 ## 🎯 Key Architecture Decisions
 
 This section highlights the most important architectural decisions and trade-offs, demonstrating architectural thinking
@@ -98,17 +116,17 @@ awareness.
 **Trade-off**: Flexibility for both monorepo and separate repo strategies, demonstrating understanding of different team
 structures.
 
-### Frontend: React 18 over React 19
+### Frontend: React 19
 
-**Decision**: React 18 over React 19 (released Dec 2024)
+**Decision**: React 19 (stable) over staying on React 18
 
 **Rationale**:
 
-- React 18 is battle-tested in production
-- React 19 is very new, ecosystem may not fully support it yet
-- Demonstrates pragmatic judgment (stability over bleeding edge)
+- React 19 is the current stable release with broad ecosystem support (Router, TanStack Query, Testing Library)
+- Keeps the portfolio stack current while remaining production-oriented
+- Types and peer ranges for our dependencies already include React 19
 
-**Trade-off**: Proven stability over latest features, consistent with Node.js LTS decision.
+**Trade-off**: Occasional ecosystem lag on older libraries; mitigated by verifying peers and the test suite.
 
 ### State Management: Zustand/Context API over Redux
 
@@ -235,8 +253,21 @@ testability. Here's an example of what a decision rule structure looks like:
 
 **Data Storage**:
 
-- **Decision evaluation results**: Stored in SQLite database (`backend/data/decisions.db`)
-- **ADRs**: Stored in SQLite database (`backend/data/decisions.db`)
+- **Recommendations (workflow results)**: Always kept in `sessionStorage` between routes after evaluate
+- **ADRs with `VITE_DATA_SOURCE=http` (default)**: Persist via Express → SQLite (`backend/data/decisions.db` when `STORAGE_PROVIDER=sqlite`)
+- **ADRs with `VITE_DATA_SOURCE=local`**: Persist in the browser (`sessionStorage`); no backend required
+- **Demo documents**: If the ADR list is empty, sample documents are seeded (API boot for `http`, first list/get for `local`) so the Documents grid is searchable out of the box
+- **Async jobs**: Evaluate + generate run on BullMQ workers (`REDIS_URL`); API returns `202 { jobId }`, clients poll `GET /api/jobs/:jobId`
+- **API hardening**: Helmet, JSON body limit, `/api` rate limit, correlation ID via `x-request-id`, central error middleware; OpenAI calls use timeout + retries
+
+**Frontend data source strategy** (`VITE_DATA_SOURCE`):
+
+| Value | Behaviour |
+|-------|-----------|
+| `http` (default) | Gateways call the HTTP API (`VITE_API_URL`). Any backend that honors the same contract works (Express today; another language later). |
+| `local` | Gateways use in-browser rules/templates + `sessionStorage` (same shapes as the API; no OpenAI, no server). |
+
+Hooks/pages never branch on the env — factories choose `Http*Gateway` or `Local*Gateway`.
 
 ## 📁 Project Structure
 
@@ -268,7 +299,7 @@ arch-decisions/
 │   │   ├── routes/          # Route registration (thin)
 │   │   ├── controllers/     # HTTP layer — parse request, call services, send response
 │   │   ├── services/        # Business logic (service layer)
-│   │   │   └── decisions/   # Decision evaluation + provider abstraction
+│   │   │   └── recommendations/   # Recommendation evaluation + provider abstraction
 │   │   ├── integrations/    # External systems (OpenAI provider, client, schemas)
 │   │   ├── domain/          # Types, pure rules (trade-off calculator)
 │   │   ├── validators/      # Zod schemas (HTTP request + response shapes)
@@ -310,7 +341,7 @@ The backend follows **layered clean architecture**: thin HTTP layer, business lo
 |--------|------|-----|
 | `routes/` | Route wiring | Declares endpoints; delegates to controllers |
 | `controllers/` | HTTP adapters | Parse/validate request, call services, map responses and status codes |
-| `services/` | Business logic | Core use cases (e.g. `evaluate-decisions.service`); no Express types |
+| `services/` | Business logic | Core use cases (e.g. `evaluate-recommendations.service`); no Express types |
 | `integrations/` | External I/O | OpenAI client/provider behind an abstraction — swappable for tests/mocks |
 | `domain/` | Types & pure rules | Shared models and calculations with no framework dependencies |
 | `validators/` | Zod schemas | Request/response validation at HTTP and integration boundaries |
@@ -335,7 +366,7 @@ Use `STORAGE_PROVIDER=memory` for demo deploys (no database file, no migrations)
 
 | Technology                  | Purpose                              |
 |-----------------------------|--------------------------------------|
-| ⚛️ **React 18**             | UI framework (functional components) |
+| ⚛️ **React 19**             | UI framework (functional components) |
 | 📘 **TypeScript**           | Type safety and developer experience |
 | ⚡ **Vite**                  | Fast build tool and dev server       |
 | 🗃️ **Zustand/Context API** | State management                     |
@@ -396,14 +427,20 @@ npm install
 npm run dev
 ```
 
+#### Frontend-only demo (no API)
+
+Set `VITE_DATA_SOURCE=local` (Compose env or Vite `.env`). Recommendations and ADRs use in-browser rules/templates + `sessionStorage`. Details: [README-FRONTEND.md](./README-FRONTEND.md#data-source-strategy-vite_data_source).
+
 ## 📚 Documentation
 
 | Document | Purpose |
 |----------|---------|
 | [TECHNICAL_SPEC.md](./TECHNICAL_SPEC.md) | API contracts, domain models, env vars |
 | [docs/examples/](./docs/examples/) | Sample contexts, ADRs, full journey walkthrough |
+| [docs/screenshots/](./docs/screenshots/) | UI showcase images for reviewers |
 | [docs/COMPETENCY_MAP.md](./docs/COMPETENCY_MAP.md) | Which features demonstrate which competencies |
 | [README-FRONTEND.md](./README-FRONTEND.md) | Frontend-focused guide for React hiring reviewers |
+| [docs/react-best-practices.md](./docs/react-best-practices.md) | Where each React best practice appears in the code |
 | [checklist.md](./checklist.md) | Validated progress vs plan (done / deferred / intentional alternatives) |
 | [ITERATION_PLAN.md](./ITERATION_PLAN.md) | Original iteration breakdown |
 

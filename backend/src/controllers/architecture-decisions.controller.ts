@@ -1,137 +1,52 @@
 import type {Request, Response} from 'express';
+import {BadRequestError, NotFoundError} from '@/lib/errors/app-error.js';
+import {readPathParam} from '@/lib/http/read-path-param.js';
 import logger from '@/lib/logging/logger.js';
 import {validateGenerateArchitectureDecisionRequest} from '@/validators/http/generate-architecture-decision-request.schema.js';
-import {GenerateArchitectureDecisionService} from '@/services/architecture-decisions/generate-architecture-decision.service.js';
+import type {EnqueueArchitectureJobService} from '@/services/jobs/enqueue-architecture-job.service.js';
 import type {ArchitectureDecisionRepository} from '@/integrations/storage/architecture-decision-repository.js';
 
 export class ArchitectureDecisionsController {
     constructor(
-        private readonly generateArchitectureDecisionService: GenerateArchitectureDecisionService,
+        private readonly enqueueArchitectureJobService: EnqueueArchitectureJobService,
         private readonly architectureDecisionRepository: ArchitectureDecisionRepository
     ) {}
 
     async post(request: Request, response: Response): Promise<void> {
-        try {
-            const validationOutcome = validateGenerateArchitectureDecisionRequest(request.body);
-            if (!validationOutcome.success) {
-                this.sendBadRequestForInvalidGeneratePayload(response, validationOutcome.errors, request.body);
-                return;
-            }
-
-            const {context, decisions} = validationOutcome.data;
-            logger.info('Architecture decision generation started', {
-                teamSize: context.teamSize,
-                computeRecommendation: decisions.compute.recommended,
-            });
-
-            const architectureDecision = await this.generateArchitectureDecisionService.generate(
-                context,
-                decisions
-            );
-
-            logger.info('Architecture decision generation completed', {
-                decisionId: architectureDecision.id,
-                title: architectureDecision.title,
-            });
-            this.sendCreatedWithArchitectureDecision(response, architectureDecision);
-        } catch (error) {
-            this.sendInternalErrorForGenerationFailure(response, request.body, error);
+        const validationOutcome = validateGenerateArchitectureDecisionRequest(request.body);
+        if (!validationOutcome.success) {
+            throw new BadRequestError('Invalid architecture decision request', validationOutcome.errors);
         }
-    }
 
-    list(_request: Request, response: Response): void {
-        try {
-            const architectureDecisions = this.architectureDecisionRepository.list();
-            this.sendOkWithArchitectureDecisionList(response, architectureDecisions);
-        } catch (error) {
-            this.sendInternalErrorForListFailure(response, error);
-        }
-    }
-
-    get(request: Request, response: Response): void {
-        try {
-            const decisionId = request.params.decisionId;
-            if (!decisionId) {
-                this.sendBadRequestForMissingDecisionId(response);
-                return;
-            }
-
-            const architectureDecision = this.architectureDecisionRepository.findById(decisionId);
-            if (!architectureDecision) {
-                this.sendNotFoundForMissingArchitectureDecision(response, decisionId);
-                return;
-            }
-
-            this.sendOkWithArchitectureDecision(response, architectureDecision);
-        } catch (error) {
-            this.sendInternalErrorForRetrievalFailure(response, request.params.decisionId, error);
-        }
-    }
-
-    private sendBadRequestForInvalidGeneratePayload(
-        response: Response,
-        validationErrors: string[],
-        requestBody: unknown
-    ): void {
-        logger.warn('Rejected architecture decision generation: invalid request payload', {
-            validationErrors,
-            requestBody,
+        const {context, recommendations} = validationOutcome.data;
+        logger.info('Enqueueing architecture decision generation job', {
+            teamSize: context.teamSize,
+            computeRecommendation: recommendations.compute.recommended,
         });
-        response.status(400).json({error: 'Invalid architecture decision request', details: validationErrors});
+
+        const jobId = await this.enqueueArchitectureJobService.enqueueGenerateArchitectureDecision(
+            context,
+            recommendations
+        );
+
+        response.status(202).json({jobId});
     }
 
-    private sendBadRequestForMissingDecisionId(response: Response): void {
-        response.status(400).json({error: 'Architecture decision id is required'});
-    }
-
-    private sendNotFoundForMissingArchitectureDecision(response: Response, decisionId: string): void {
-        logger.info('Architecture decision not found', {decisionId});
-        response.status(404).json({error: 'Architecture decision not found'});
-    }
-
-    private sendCreatedWithArchitectureDecision(response: Response, architectureDecision: unknown): void {
-        response.status(201).json({architectureDecision});
-    }
-
-    private sendOkWithArchitectureDecision(response: Response, architectureDecision: unknown): void {
-        response.status(200).json({architectureDecision});
-    }
-
-    private sendOkWithArchitectureDecisionList(response: Response, architectureDecisions: unknown): void {
+    list(request: Request, response: Response): void {
+        const search = typeof request.query.search === 'string' ? request.query.search : undefined;
+        const status = typeof request.query.status === 'string' ? request.query.status : undefined;
+        const architectureDecisions = this.architectureDecisionRepository.list({search, status});
         response.status(200).json({architectureDecisions});
     }
 
-    private sendInternalErrorForGenerationFailure(
-        response: Response,
-        requestBody: unknown,
-        error: unknown
-    ): void {
-        logger.error('Architecture decision generation failed', {
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-            requestBody,
-        });
-        response.status(500).json({error: 'Internal server error'});
-    }
+    get(request: Request, response: Response): void {
+        const decisionId = readPathParam(request.params.decisionId, 'Architecture decision id');
 
-    private sendInternalErrorForRetrievalFailure(
-        response: Response,
-        decisionId: string | undefined,
-        error: unknown
-    ): void {
-        logger.error('Architecture decision retrieval failed', {
-            decisionId,
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-        });
-        response.status(500).json({error: 'Internal server error'});
-    }
+        const architectureDecision = this.architectureDecisionRepository.findById(decisionId);
+        if (!architectureDecision) {
+            throw new NotFoundError('Architecture decision not found');
+        }
 
-    private sendInternalErrorForListFailure(response: Response, error: unknown): void {
-        logger.error('Architecture decision list failed', {
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-        });
-        response.status(500).json({error: 'Internal server error'});
+        response.status(200).json({architectureDecision});
     }
 }

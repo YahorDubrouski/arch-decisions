@@ -1,7 +1,7 @@
 import type {ArchitectureDecisionDraft} from '@/domain/architecture-decision.js';
 import type {ProjectContext} from '@/domain/context.js';
-import type {DecisionsResponse} from '@/domain/DecisionsResponse.js';
+import type {RecommendationsResponse} from '@/domain/RecommendationsResponse.js';
 
 export interface ArchitectureDecisionGenerator {
-    generate(context: ProjectContext, decisions: DecisionsResponse): Promise<ArchitectureDecisionDraft>;
+    generate(context: ProjectContext, recommendations: RecommendationsResponse): Promise<ArchitectureDecisionDraft>;
 }

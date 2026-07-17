@@ -20,14 +20,25 @@ describe('contextStorage', () => {
     });
 
     it('saves and reads project context from sessionStorage', () => {
-        saveProjectContext(sampleContext);
+        // Arrange
+        // (sample project context)
 
-        expect(getProjectContext()).toEqual(sampleContext);
+        // Act
+        saveProjectContext(sampleContext);
+        const result = getProjectContext();
+
+        // Assert
+        expect(result).toEqual(sampleContext);
     });
 
     it('returns null for invalid stored context', () => {
+        // Arrange
         sessionStorage.setItem('arch-decisions:context', JSON.stringify({invalid: true}));
 
-        expect(getProjectContext()).toBeNull();
+        // Act
+        const result = getProjectContext();
+
+        // Assert
+        expect(result).toBeNull();
     });
 });

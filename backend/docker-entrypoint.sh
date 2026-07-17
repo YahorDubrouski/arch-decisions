@@ -6,7 +6,9 @@ echo "⚠️  Installing/updating dependencies in bind mount..."
 cd /app && npm install --no-audit --no-fund
 
 # Execute the main command
-if [ "${STORAGE_PROVIDER:-sqlite}" != "memory" ]; then
+# Workers share the API DB file — migrations run once on the API container.
+# Example: SKIP_DB_MIGRATIONS=1 on worker → skip migrate; unset on API → run migrate.
+if [ "${STORAGE_PROVIDER:-sqlite}" != "memory" ] && [ "${SKIP_DB_MIGRATIONS:-0}" != "1" ]; then
   echo "Running database migrations..."
   npm run migrate
 fi

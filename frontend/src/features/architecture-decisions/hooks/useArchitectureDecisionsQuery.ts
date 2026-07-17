@@ -1,9 +1,15 @@
 import {useQuery} from '@tanstack/react-query';
-import {fetchArchitectureDecisions} from '@/features/architecture-decisions/services/architectureDecisionService';
+import type {ArchitectureDecisionListFilters} from '@/features/architecture-decisions/domain/listFilters';
+import {architectureDecisionGateway} from '@/features/architecture-decisions/gateways/architectureDecisionGateway';
 
-export function useArchitectureDecisionsQuery() {
+export function useArchitectureDecisionsQuery(filters: ArchitectureDecisionListFilters) {
+    const listFilters = {
+        search: filters.search,
+        status: filters.status,
+    };
+
     return useQuery({
-        queryKey: ['architecture-decisions'],
-        queryFn: ({signal}) => fetchArchitectureDecisions(signal),
+        queryKey: ['architecture-decisions', listFilters],
+        queryFn: ({signal}) => architectureDecisionGateway.list(listFilters, signal),
     });
 }

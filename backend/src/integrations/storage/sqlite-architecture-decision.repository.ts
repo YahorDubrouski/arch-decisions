@@ -1,7 +1,9 @@
 import type {
     ArchitectureDecision,
+    ArchitectureDecisionListFilters,
     ArchitectureDecisionListItem,
 } from '@/domain/architecture-decision.js';
+import {matchesArchitectureDecisionListFilters} from '@/domain/architecture-decision.js';
 import {getDatabase} from './database.js';
 import type {ArchitectureDecisionRepository} from './architecture-decision-repository.js';
 
@@ -74,7 +76,7 @@ export class SqliteArchitectureDecisionRepository implements ArchitectureDecisio
         return mapRow(row);
     }
 
-    list(): ArchitectureDecisionListItem[] {
+    list(filters: ArchitectureDecisionListFilters = {}): ArchitectureDecisionListItem[] {
         const database = getDatabase();
         const rows = database
             .prepare(
@@ -84,6 +86,8 @@ export class SqliteArchitectureDecisionRepository implements ArchitectureDecisio
             )
             .all() as ArchitectureDecisionListRow[];
 
-        return rows.map(mapListRow);
+        return rows
+            .map(mapListRow)
+            .filter((item) => matchesArchitectureDecisionListFilters(item, filters));
     }
 }

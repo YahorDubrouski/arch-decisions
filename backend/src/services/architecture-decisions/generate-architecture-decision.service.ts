@@ -1,7 +1,7 @@
 import {randomUUID} from 'node:crypto';
 import type {ArchitectureDecision} from '@/domain/architecture-decision.js';
 import type {ProjectContext} from '@/domain/context.js';
-import type {DecisionsResponse} from '@/domain/DecisionsResponse.js';
+import type {RecommendationsResponse} from '@/domain/RecommendationsResponse.js';
 import type {ArchitectureDecisionRepository} from '@/integrations/storage/architecture-decision-repository.js';
 import type {ArchitectureDecisionGenerator} from './architecture-decision-generator.js';
 
@@ -13,9 +13,9 @@ export class GenerateArchitectureDecisionService {
 
     async generate(
         context: ProjectContext,
-        decisions: DecisionsResponse
+        recommendations: RecommendationsResponse
     ): Promise<ArchitectureDecision> {
-        const draft = await this.architectureDecisionGenerator.generate(context, decisions);
+        const draft = await this.architectureDecisionGenerator.generate(context, recommendations);
         const architectureDecision: ArchitectureDecision = {
             id: randomUUID(),
             title: draft.title,

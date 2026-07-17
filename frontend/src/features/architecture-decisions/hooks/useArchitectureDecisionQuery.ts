@@ -1,10 +1,10 @@
 import {useQuery} from '@tanstack/react-query';
-import {fetchArchitectureDecisionById} from '@/features/architecture-decisions/services/architectureDecisionService';
+import {architectureDecisionGateway} from '@/features/architecture-decisions/gateways/architectureDecisionGateway';
 
 export function useArchitectureDecisionQuery(decisionId: string | undefined) {
     return useQuery({
         queryKey: ['architecture-decision', decisionId],
-        queryFn: () => fetchArchitectureDecisionById(decisionId!),
+        queryFn: () => architectureDecisionGateway.getById(decisionId!),
         enabled: Boolean(decisionId),
     });
 }

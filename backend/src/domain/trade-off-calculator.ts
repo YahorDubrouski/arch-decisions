@@ -1,10 +1,10 @@
 // Domain rule helper: maps option to trade-off levels
 
-import type {DecisionCategory, TradeOffs} from './DecisionCategory.js';
+import type {RecommendationCategory, TradeOffs} from './RecommendationCategory.js';
 
 type OptionName = string;
 
-const TRADE_OFF_MAP: Record<DecisionCategory, Record<OptionName, TradeOffs>> = {
+const TRADE_OFF_MAP: Record<RecommendationCategory, Record<OptionName, TradeOffs>> = {
     compute: {
         EC2: {
             cost: 'low',
@@ -90,7 +90,7 @@ const TRADE_OFF_MAP: Record<DecisionCategory, Record<OptionName, TradeOffs>> = {
  * Falls back to medium-across-the-board if option is unknown.
  */
 export function calculateTradeOffs(
-    category: DecisionCategory,
+    category: RecommendationCategory,
     option: string
 ): TradeOffs {
     const categoryMap = TRADE_OFF_MAP[category];

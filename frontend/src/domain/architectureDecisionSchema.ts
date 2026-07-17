@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import type {ProjectContext} from './contextSchema';
-import type {DecisionsResponse} from './decisionsSchema';
+import type {RecommendationsResponse} from './recommendationsSchema';
 
 export const architectureDecisionStatusSchema = z.literal('proposed');
 
@@ -30,5 +30,5 @@ export type ArchitectureDecisionListItem = z.infer<typeof architectureDecisionLi
 
 export type GenerateArchitectureDecisionRequest = {
     context: ProjectContext;
-    decisions: DecisionsResponse;
+    recommendations: RecommendationsResponse;
 };

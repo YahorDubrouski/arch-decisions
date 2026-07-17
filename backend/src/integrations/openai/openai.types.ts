@@ -1,4 +1,4 @@
 import type {z} from 'zod';
-import type {openAIDecisionsResponseSchema} from './openai-decisions-response.schema.js';
+import type {openAIRecommendationsResponseSchema} from './openai-recommendations-response.schema.js';
 
-export type OpenAIDecisionsResponse = z.infer<typeof openAIDecisionsResponseSchema>;
+export type OpenAIRecommendationsResponse = z.infer<typeof openAIRecommendationsResponseSchema>;

@@ -4,12 +4,13 @@ import {ArchitectureDecisionFull} from '../ArchitectureDecisionFull';
 
 describe('ArchitectureDecisionFull', () => {
     it('renders markdown headings and lists as HTML', () => {
-        render(
-            <ArchitectureDecisionFull
-                content={'# Architecture Decision Record\n\n## Decision\n\n- **Compute:** ECS\n'}
-            />
-        );
+        // Arrange
+        const markdownContent = '# Architecture Decision Record\n\n## Decision\n\n- **Compute:** ECS\n';
 
+        // Act
+        render(<ArchitectureDecisionFull content={markdownContent}/>);
+
+        // Assert
         expect(
             screen.getByRole('article', {name: 'Architecture decision full document'})
         ).toBeInTheDocument();

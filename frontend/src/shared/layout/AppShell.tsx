@@ -1,7 +1,7 @@
 import {ReactNode} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {LogoMark} from '@/shared/brand/LogoMark';
-import {ContextIcon, DecisionsIcon, DocumentIcon, HomeIcon} from '@/shared/ui/icons/Icons';
+import {ContextIcon, RecommendationsIcon, DocumentIcon, HomeIcon} from '@/shared/ui/icons/Icons';
 import styles from './AppShell.module.css';
 
 type AppShellProps = {
@@ -11,7 +11,7 @@ type AppShellProps = {
 const NAV_ITEMS = [
     {to: '/', label: 'Home', Icon: HomeIcon, end: true},
     {to: '/context', label: 'Context', Icon: ContextIcon, end: false},
-    {to: '/decisions', label: 'Decisions', Icon: DecisionsIcon, end: false},
+    {to: '/recommendations', label: 'Recommendations', Icon: RecommendationsIcon, end: false},
     {to: '/architecture-decisions', label: 'Documents', Icon: DocumentIcon, end: false},
 ] as const;
 

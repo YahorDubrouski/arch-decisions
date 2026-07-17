@@ -40,8 +40,8 @@ export function ArchitectureDecisionPage() {
                     onRetry={() => void refetch()}
                 />
                 <div className={ui.actionsRow}>
-                    <Link to="/decisions" className={ui.btnSecondary}>
-                        Back to decisions
+                    <Link to="/recommendations" className={ui.btnSecondary}>
+                        Back to recommendations
                     </Link>
                 </div>
             </div>
@@ -77,8 +77,8 @@ export function ArchitectureDecisionPage() {
             />
 
             <div className={ui.actionsRow}>
-                <Link to="/decisions" className={ui.btnSecondary}>
-                    Back to decisions
+                <Link to="/recommendations" className={ui.btnSecondary}>
+                    Back to recommendations
                 </Link>
                 <Link to="/" className={ui.btnGhost}>
                     Home

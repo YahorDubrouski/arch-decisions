@@ -1,9 +1,9 @@
-import {ContextIcon, DecisionsIcon, DocumentIcon, ArrowRightIcon} from '@/shared/ui/icons/Icons';
+import {ContextIcon, RecommendationsIcon, DocumentIcon, ArrowRightIcon} from '@/shared/ui/icons/Icons';
 import styles from './WorkflowIllustration.module.css';
 
 const STEPS = [
     {label: 'Define context', detail: 'Team, traffic, compliance', Icon: ContextIcon, tone: styles.stepContext},
-    {label: 'Evaluate options', detail: 'Compute, secrets, CI/CD', Icon: DecisionsIcon, tone: styles.stepDecisions},
+    {label: 'Evaluate options', detail: 'Compute, secrets, CI/CD', Icon: RecommendationsIcon, tone: styles.stepDecisions},
     {label: 'Generate ADR', detail: 'Summary + full document', Icon: DocumentIcon, tone: styles.stepDocument},
 ] as const;
 

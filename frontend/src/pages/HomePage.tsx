@@ -1,6 +1,6 @@
 import {Link, useNavigate} from 'react-router-dom';
+import {ArchitectureFlowDiagram} from '@/shared/brand/ArchitectureFlowDiagram';
 import {clearProjectSession, hasProjectSession} from '@/shared/session/projectSession';
-import {WorkflowIllustration} from '@/shared/ui/WorkflowIllustration';
 import {CheckCircleIcon} from '@/shared/ui/icons/Icons';
 import ui from '@/shared/styles/ui.module.css';
 import styles from './HomePage.module.css';
@@ -17,7 +17,7 @@ export function HomePage() {
     function handleStartNewProject(): void {
         if (hasProjectSession()) {
             const confirmed = window.confirm(
-                'Start a new project? This clears your current context, decisions, and documents from this session.'
+                'Start a new project? This clears your current context, recommendations, and documents from this session.'
             );
             if (!confirmed) {
                 return;
@@ -31,6 +31,7 @@ export function HomePage() {
     return (
         <div className={styles.hero}>
             <div className={styles.heroContent}>
+                <p className={styles.brandLockup}>Arch Decisions</p>
                 <span className={ui.eyebrow}>Architecture decision workflow</span>
                 <h1 className={styles.title}>
                     Turn context into clear{' '}
@@ -54,14 +55,14 @@ export function HomePage() {
                     <button type="button" className={ui.btnPrimary} onClick={handleStartNewProject}>
                         Start new project
                     </button>
-                    <Link to="/decisions" className={ui.btnSecondary}>
-                        View decisions
+                    <Link to="/recommendations" className={ui.btnSecondary}>
+                        View recommendations
                     </Link>
                 </div>
             </div>
 
-            <aside className={styles.heroAside} aria-label="Workflow overview">
-                <WorkflowIllustration/>
+            <aside className={styles.heroAside} aria-label="Architecture decision flow diagram">
+                <ArchitectureFlowDiagram/>
             </aside>
         </div>
     );

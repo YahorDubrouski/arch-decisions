@@ -3,10 +3,23 @@
 }
 
 .pageHeader {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+    gap: var(--spacing-lg);
+    align-items: stretch;
+    margin-bottom: var(--spacing-lg);
+}
+
+.headerCopy {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+}
+
+@media (max-width: 840px) {
+    .pageHeader {
+        grid-template-columns: 1fr;
+    }
 }
 
 .navigation {

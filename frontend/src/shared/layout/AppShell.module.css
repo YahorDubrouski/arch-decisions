@@ -2,6 +2,11 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background:
+        radial-gradient(ellipse at top left, rgba(20, 184, 166, 0.1), transparent 42%),
+        radial-gradient(ellipse at top right, rgba(2, 132, 199, 0.08), transparent 36%),
+        linear-gradient(180deg, #e8edf3 0%, #eef2f7 48%, #e8edf3 100%);
+    background-attachment: fixed;
 }
 
 .header {
@@ -103,6 +108,10 @@
     width: min(100%, var(--layout-max-width));
     margin-inline: auto;
     padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-3xl);
+}
+
+.main:has([data-page='architecture-decisions']) {
+    width: min(100%, 1280px);
 }
 
 .footer {
