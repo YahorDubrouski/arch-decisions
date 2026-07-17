@@ -51,7 +51,7 @@ Canonical coding rules for this stack: [`.cursor/rules/react-portfolio-rules.mdc
 | 12 | **Migrations for schema** — not ad-hoc DDL in app boot | [migrations/](../backend/src/migrations/) |
 | 13 | **Composition root / DI** for wiring | [create-app-container.ts](../backend/src/app/create-app-container.ts) |
 | 14 | **Tests: Arrange / Act / Assert** (+ Given/When/Then when non-trivial) | [recommendation-provider.factory.test.ts](../backend/src/integrations/openai/__tests__/recommendation-provider.factory.test.ts) · [tests.mdc](../.cursor/rules/tests.mdc) |
-| 15 | **HTTP API integration tests** (Supertest) | [controllers/__tests__/](../backend/src/controllers/__tests__/) · [health.integration.test.ts](../backend/src/routes/health/__tests__/health.integration.test.ts) · [openapi.integration.test.ts](../backend/src/routes/__tests__/openapi.integration.test.ts) |
+| 15 | **HTTP API integration tests** (Supertest) | [controllers/recommendations/__tests__/](../backend/src/controllers/recommendations/__tests__/) · [controllers/architecture-decisions/__tests__/](../backend/src/controllers/architecture-decisions/__tests__/) · [controllers/jobs/__tests__/](../backend/src/controllers/jobs/__tests__/) · [health](../backend/src/routes/health/__tests__/health.integration.test.ts) · [openapi](../backend/src/routes/__tests__/openapi.integration.test.ts) |
 | 16 | **OpenAPI / Swagger UI** | [openapi/schemas/](../backend/src/openapi/schemas/) · [generate.openapi.ts](../backend/src/routes/architecture-decisions/generate.openapi.ts) · [swagger.routes.ts](../backend/src/routes/swagger.routes.ts) · [screenshot](./screenshots/07-swagger-express.png) |
 
 ---
@@ -73,7 +73,7 @@ Same product contract as Express (`202` + job polling). Proof links below.
 | 9 | **Correlation ID + errors** | [correlation_id.py](../backend-python/src/arch_decisions/api/middleware/correlation_id.py) · [errors.py](../backend-python/src/arch_decisions/core/errors.py) |
 | 10 | **Provider matrix smoke** | [verify_provider_matrix.py](../backend-python/scripts/verify_provider_matrix.py) |
 | 11 | **pytest suite** | [tests/unit/](../backend-python/tests/unit/) |
-| 12 | **HTTP API integration tests** (TestClient) | [tests/api/](../backend-python/tests/api/) (one module per endpoint) |
+| 12 | **HTTP API integration tests** (TestClient) | [tests/api/](../backend-python/tests/api/) (folder per domain: recommendations, architecture_decisions, jobs, …) |
 | 13 | **OpenAPI / Swagger UI** | [api/schemas/](../backend-python/src/arch_decisions/api/schemas/) · [architecture_decisions_generate_docs.py](../backend-python/src/arch_decisions/api/routes/architecture_decisions_generate_docs.py) · FastAPI `/docs` · [screenshot](./screenshots/08-swagger-python.png) |
 
 ---
