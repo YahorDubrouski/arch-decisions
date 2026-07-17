@@ -9,12 +9,14 @@ Two interchangeable backends share the same HTTP contract:
 | Express | `http://localhost:3001` | http://localhost:3001/api-docs |
 | Python (FastAPI) | `http://localhost:3002` | http://localhost:3002/docs |
 
-OpenAPI is **generated from code** on each backend (same HTTP contract, separate schemas):
+OpenAPI is **generated from code**. Shared schemas live once; each endpoint’s Swagger narrative lives next to its route:
 
-| Backend | Schemas | Route metadata | Live spec |
-|---------|---------|----------------|-----------|
-| Express | [openapi/schemas.ts](../backend/src/openapi/schemas.ts) | [register-paths.ts](../backend/src/openapi/register-paths.ts) | http://localhost:3001/openapi.json |
-| Python | [api/schemas](../backend-python/src/arch_decisions/api/schemas/__init__.py) | FastAPI route decorators | http://localhost:3002/openapi.json |
+| Backend | Shared schemas | Endpoint docs (sibling of route) | Live spec |
+|---------|----------------|----------------------------------|-----------|
+| Express | [openapi/schemas/](../backend/src/openapi/schemas/) (by domain) | e.g. [generate.openapi.ts](../backend/src/routes/architecture-decisions/generate.openapi.ts) next to [generate.route.ts](../backend/src/routes/architecture-decisions/generate.route.ts) | http://localhost:3001/openapi.json |
+| Python | [api/schemas/](../backend-python/src/arch_decisions/api/schemas/) (by domain) | e.g. [architecture_decisions_generate_docs.py](../backend-python/src/arch_decisions/api/routes/architecture_decisions_generate_docs.py) used by [architecture_decisions.py](../backend-python/src/arch_decisions/api/routes/architecture_decisions.py) | http://localhost:3002/openapi.json |
+
+Pattern: `*.route.ts` / route handler = behavior; `*.openapi.ts` / `*_docs.py` = Swagger text for that endpoint.
 
 ### Swagger screenshots
 

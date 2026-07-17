@@ -37,7 +37,7 @@ Short themes below. **Full practice → file map:** [practices.md](./practices.m
 | React maturity | Correct state ownership; gateways; thin pages; co-located tests |
 | Pragmatic DevOps | Docker compose, migrations, worker split, verify script |
 | Dual backend | Express + FastAPI sharing one API contract (`:3001` / `:3002`) |
-| OpenAPI / Swagger | Code-first OpenAPI (Zod / Pydantic schemas); UI at `/api-docs` (Express) and `/docs` (Python) |
+| OpenAPI / Swagger | Code-first OpenAPI; shared schemas + per-endpoint sibling docs (`*.openapi.ts` / `*_docs.py`); UI at `/api-docs` (Express) and `/docs` (Python) |
 
 ---
 

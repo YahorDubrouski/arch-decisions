@@ -14,4 +14,4 @@ Desktop showcase captures (1440×900 viewport, Playwright) for README and journe
 | [08-swagger-python.png](./08-swagger-python.png) | Swagger UI — Python API | `http://localhost:3002/docs` |
 
 Regenerate UI shots after major frontend changes against Vite (`http://localhost:5174`).  
-Regenerate Swagger shots against the running APIs after OpenAPI schema/route changes (Express: `backend/src/openapi/`, Python: `backend-python/.../api/schemas` + routes).
+Regenerate Swagger shots against the running APIs after OpenAPI schema or per-endpoint docs changes (Express: `routes/**/*.openapi.ts` + `openapi/schemas/`; Python: `api/schemas/` + `api/routes/*_docs.py`).

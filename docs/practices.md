@@ -52,7 +52,7 @@ Canonical coding rules for this stack: [`.cursor/rules/react-portfolio-rules.mdc
 | 13 | **Composition root / DI** for wiring | [create-app-container.ts](../backend/src/app/create-app-container.ts) |
 | 14 | **Tests: Arrange / Act / Assert** (+ Given/When/Then when non-trivial) | [recommendation-provider.factory.test.ts](../backend/src/integrations/openai/__tests__/recommendation-provider.factory.test.ts) · [tests.mdc](../.cursor/rules/tests.mdc) |
 | 15 | **HTTP API integration tests** (Supertest) | [api.integration.test.ts](../backend/src/__tests__/api.integration.test.ts) |
-| 16 | **OpenAPI / Swagger UI** | [schemas.ts](../backend/src/openapi/schemas.ts) · [register-paths.ts](../backend/src/openapi/register-paths.ts) · [swagger.routes.ts](../backend/src/routes/swagger.routes.ts) · [screenshot](./screenshots/07-swagger-express.png) |
+| 16 | **OpenAPI / Swagger UI** | [openapi/schemas/](../backend/src/openapi/schemas/) · [generate.openapi.ts](../backend/src/routes/architecture-decisions/generate.openapi.ts) · [swagger.routes.ts](../backend/src/routes/swagger.routes.ts) · [screenshot](./screenshots/07-swagger-express.png) |
 
 ---
 
@@ -74,7 +74,7 @@ Same product contract as Express (`202` + job polling). Proof links below.
 | 10 | **Provider matrix smoke** | [verify_provider_matrix.py](../backend-python/scripts/verify_provider_matrix.py) |
 | 11 | **pytest suite** | [tests/unit/](../backend-python/tests/unit/) |
 | 12 | **HTTP API integration tests** (TestClient) | [test_api_integration.py](../backend-python/tests/api/test_api_integration.py) |
-| 13 | **OpenAPI / Swagger UI** | [api/schemas](../backend-python/src/arch_decisions/api/schemas/__init__.py) · FastAPI `/docs` · [screenshot](./screenshots/08-swagger-python.png) |
+| 13 | **OpenAPI / Swagger UI** | [api/schemas/](../backend-python/src/arch_decisions/api/schemas/) · [architecture_decisions_generate_docs.py](../backend-python/src/arch_decisions/api/routes/architecture_decisions_generate_docs.py) · FastAPI `/docs` · [screenshot](./screenshots/08-swagger-python.png) |
 
 ---
 

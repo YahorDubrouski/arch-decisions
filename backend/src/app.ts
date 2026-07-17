@@ -1,10 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import {registerHealthRoutes} from './routes/health.routes.js';
-import {registerRecommendationsRoutes} from './routes/recommendations.routes.js';
-import {registerArchitectureDecisionsRoutes} from './routes/architecture-decisions.routes.js';
-import {registerJobsRoutes} from './routes/jobs.routes.js';
+import {registerGenerateRoute} from './routes/architecture-decisions/generate.route.js';
+import {registerGetRoute} from './routes/architecture-decisions/get.route.js';
+import {registerListRoute} from './routes/architecture-decisions/list.route.js';
+import {registerHealthRoute} from './routes/health/health.route.js';
+import {registerGetJobRoute} from './routes/jobs/get.route.js';
+import {registerEvaluateRoute} from './routes/recommendations/evaluate.route.js';
 import {registerSwaggerRoutes} from './routes/swagger.routes.js';
 import {createAppContainer} from './app/create-app-container.js';
 import {seedArchitectureDecisionsIfEmpty} from './integrations/storage/seed/seed-architecture-decisions-if-empty.js';
@@ -41,12 +43,14 @@ export function createApp() {
     seedArchitectureDecisionsIfEmpty(container.resolve('architectureDecisionRepository'));
 
     registerSwaggerRoutes(app);
-    registerHealthRoutes(app);
+    registerHealthRoute(app);
 
     const api = createApiRouter(app);
-    registerRecommendationsRoutes(api, container.resolve('recommendationsController'));
-    registerArchitectureDecisionsRoutes(api, container.resolve('architectureDecisionsController'));
-    registerJobsRoutes(api, container.resolve('jobsController'));
+    registerEvaluateRoute(api, container.resolve('recommendationsController'));
+    registerGenerateRoute(api, container.resolve('architectureDecisionsController'));
+    registerListRoute(api, container.resolve('architectureDecisionsController'));
+    registerGetRoute(api, container.resolve('architectureDecisionsController'));
+    registerGetJobRoute(api, container.resolve('jobsController'));
 
     app.use(errorHandlerMiddleware);
 
