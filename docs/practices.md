@@ -51,6 +51,30 @@ Canonical coding rules for this stack: [`.cursor/rules/react-portfolio-rules.mdc
 | 12 | **Migrations for schema** — not ad-hoc DDL in app boot | [migrations/](../backend/src/migrations/) |
 | 13 | **Composition root / DI** for wiring | [create-app-container.ts](../backend/src/app/create-app-container.ts) |
 | 14 | **Tests: Arrange / Act / Assert** (+ Given/When/Then when non-trivial) | [recommendation-provider.factory.test.ts](../backend/src/integrations/openai/__tests__/recommendation-provider.factory.test.ts) · [tests.mdc](../.cursor/rules/tests.mdc) |
+| 15 | **HTTP API integration tests** (Supertest) | [api.integration.test.ts](../backend/src/__tests__/api.integration.test.ts) |
+| 16 | **OpenAPI / Swagger UI** | [schemas.ts](../backend/src/openapi/schemas.ts) · [register-paths.ts](../backend/src/openapi/register-paths.ts) · [swagger.routes.ts](../backend/src/routes/swagger.routes.ts) · [screenshot](./screenshots/07-swagger-express.png) |
+
+---
+
+## Backend Python (senior FastAPI)
+
+Same product contract as Express (`202` + job polling). Proof links below.
+
+| # | Rule | Proof |
+|---|------|-------|
+| 1 | **Thin HTTP layer** | [recommendations.py](../backend-python/src/arch_decisions/api/routes/recommendations.py) |
+| 2 | **Services hold use cases** | [services/](../backend-python/src/arch_decisions/services/) |
+| 3 | **Factories + fail loud** | [recommendation_provider_factory.py](../backend-python/src/arch_decisions/infrastructure/openai/recommendation_provider_factory.py) |
+| 4 | **Pydantic at boundaries** | [context.py](../backend-python/src/arch_decisions/domain/context.py) · route validation |
+| 5 | **Composition root + Depends** | [container.py](../backend-python/src/arch_decisions/container.py) · [deps.py](../backend-python/src/arch_decisions/api/deps.py) |
+| 6 | **Celery worker split** | [tasks.py](../backend-python/src/arch_decisions/workers/tasks.py) · [worker.py](../backend-python/src/arch_decisions/worker.py) |
+| 7 | **PostgreSQL + Alembic** | [models.py](../backend-python/src/arch_decisions/infrastructure/db/models.py) · [alembic/versions/](../backend-python/alembic/versions/) |
+| 8 | **OpenAI retries** | [openai_gateway.py](../backend-python/src/arch_decisions/infrastructure/openai/openai_gateway.py) |
+| 9 | **Correlation ID + errors** | [correlation_id.py](../backend-python/src/arch_decisions/api/middleware/correlation_id.py) · [errors.py](../backend-python/src/arch_decisions/core/errors.py) |
+| 10 | **Provider matrix smoke** | [verify_provider_matrix.py](../backend-python/scripts/verify_provider_matrix.py) |
+| 11 | **pytest suite** | [tests/unit/](../backend-python/tests/unit/) |
+| 12 | **HTTP API integration tests** (TestClient) | [test_api_integration.py](../backend-python/tests/api/test_api_integration.py) |
+| 13 | **OpenAPI / Swagger UI** | [api/schemas](../backend-python/src/arch_decisions/api/schemas/__init__.py) · FastAPI `/docs` · [screenshot](./screenshots/08-swagger-python.png) |
 
 ---
 

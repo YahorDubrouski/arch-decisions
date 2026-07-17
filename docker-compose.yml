@@ -31,7 +31,7 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - REDIS_URL=redis://redis:6379
+      REDIS_URL: ${REDIS_URL}
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts
@@ -53,8 +53,8 @@ services:
     env_file:
       - ./backend/.env
     environment:
-      - REDIS_URL=redis://redis:6379
-      - SKIP_DB_MIGRATIONS=1
+      REDIS_URL: ${REDIS_URL}
+      SKIP_DB_MIGRATIONS: "1"
     volumes:
       - ./backend/src:/app/src
       - ./backend/scripts:/app/scripts
@@ -74,6 +74,76 @@ services:
       - "6379:6379"
     networks:
       - arch-decisions-network
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - arch-decisions-network
+
+  backend-python:
+    build:
+      context: ./backend-python
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3000"
+    env_file:
+      - ./backend-python/.env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      # Built from root .env so the password is not hardcoded in compose.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    volumes:
+      - ./backend-python:/app
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    networks:
+      - arch-decisions-network
+
+  worker-python:
+    build:
+      context: ./backend-python
+      dockerfile: Dockerfile
+    command: celery -A arch_decisions.worker.celery_app worker --loglevel=INFO --concurrency=2
+    env_file:
+      - ./backend-python/.env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SKIP_DB_MIGRATIONS: "1"
+    volumes:
+      - ./backend-python:/app
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+      backend-python:
+        condition: service_started
+    networks:
+      - arch-decisions-network
+
+volumes:
+  postgres_data:
 
 networks:
   arch-decisions-network:

@@ -9,12 +9,14 @@ A short path to evaluate this portfolio without reading the whole repo.
 1. **Read** [README.md](../README.md) (overview + screenshots)  
 2. **Run** `make docker-up` → open http://localhost:5174  
 3. **Walk** Context → Recommendations → Generate ADR → Documents → open ADR (summary + full)  
-4. **Skim** [architecture.md](./architecture.md) (decisions + provider model)  
-5. **Open** [practices.md](./practices.md) — **must-have checklists with proof links**, then the full practice map  
-6. **Deep-dive code** (pick one track):
-   - **Full stack:** [create-app-container.ts](../backend/src/app/create-app-container.ts) · [start-architecture-jobs-worker.ts](../backend/src/jobs/start-architecture-jobs-worker.ts)
+4. **Backend API (optional):** open Swagger — [Express](http://localhost:3001/api-docs) or [Python](http://localhost:3002/docs) (screenshots in [reference.md](./reference.md#swagger-screenshots))  
+5. **Skim** [architecture.md](./architecture.md) (decisions + provider model)  
+6. **Open** [practices.md](./practices.md) — **must-have checklists with proof links**, then the full practice map  
+7. **Deep-dive code** (pick one track):
+   - **Express:** [create-app-container.ts](../backend/src/app/create-app-container.ts) · [start-architecture-jobs-worker.ts](../backend/src/jobs/start-architecture-jobs-worker.ts)
+   - **Python:** [container.py](../backend-python/src/arch_decisions/container.py) · [tasks.py](../backend-python/src/arch_decisions/workers/tasks.py)
    - **Frontend:** [recommendations/gateways/](../frontend/src/features/recommendations/gateways/) · [RecommendationsPage.tsx](../frontend/src/pages/RecommendationsPage.tsx)
-   - **Config:** [recommendation-provider.factory.ts](../backend/src/integrations/openai/recommendation-provider.factory.ts) (explicit provider, fail loud)
+   - **Config:** [recommendation-provider.factory.ts](../backend/src/integrations/openai/recommendation-provider.factory.ts) or [recommendation_provider_factory.py](../backend-python/src/arch_decisions/infrastructure/openai/recommendation_provider_factory.py) (fail loud)
 
 Optional: [full journey](./examples/flows/full-journey.md) with curl examples.
 
@@ -34,6 +36,8 @@ Short themes below. **Full practice → file map:** [practices.md](./practices.m
 | ADRs | Generate, persist, view, export markdown |
 | React maturity | Correct state ownership; gateways; thin pages; co-located tests |
 | Pragmatic DevOps | Docker compose, migrations, worker split, verify script |
+| Dual backend | Express + FastAPI sharing one API contract (`:3001` / `:3002`) |
+| OpenAPI / Swagger | Code-first OpenAPI (Zod / Pydantic schemas); UI at `/api-docs` (Express) and `/docs` (Python) |
 
 ---
 

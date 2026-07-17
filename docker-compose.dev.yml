@@ -28,3 +28,10 @@ services:
   worker:
     # Override: tsx watch so source mounts are live (base Dockerfile still builds dist for start)
     command: npm run worker:dev
+
+  backend-python:
+    # Hot reload for FastAPI during development (--factory avoids import-time DB boot)
+    command: uvicorn arch_decisions.main:create_app --factory --host 0.0.0.0 --port 3000 --reload
+
+  worker-python:
+    command: celery -A arch_decisions.worker.celery_app worker --loglevel=INFO --concurrency=2

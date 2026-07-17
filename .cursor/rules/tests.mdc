@@ -1,6 +1,6 @@
 ---
 description: Test structure comments and business-facing test documentation
-globs: "**/{**/__tests__/**,**/test/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx}"
+globs: "**/{**/__tests__/**,**/tests/**,**/test/**,**/*.test.ts,**/*.test.tsx,**/*.spec.ts,**/*.spec.tsx,**/test_*.py}"
 alwaysApply: false
 ---
 

@@ -1,0 +1,96 @@
+# Project manifest for the Python backend (declares the package + dependencies + tool settings).
+# Install runtime:     pip install -e .
+# Install + test/lint: pip install -e ".[dev]"
+
+[project]
+name = "arch-decisions"
+version = "1.0.0"
+description = "Architecture Decisions Platform — Python backend (FastAPI)"
+readme = "README.md"
+requires-python = ">=3.12"
+
+# Runtime dependencies (needed to run the API and Celery worker).
+#
+# Syntax package[extra]: install the package AND a named optional bundle from that package.
+# Example: uvicorn[standard] = uvicorn + performance extras (uvloop, httptools).
+# Example: celery[redis] = celery + Redis transport support.
+# Example: psycopg[binary] = Postgres driver with a prebuilt binary wheel (simpler in Docker).
+dependencies = [
+    "fastapi>=0.115.0",              # HTTP API framework
+    "uvicorn[standard]>=0.32.0",     # ASGI server that runs FastAPI
+    "pydantic>=2.9.0",               # Request/response and domain validation models
+    "pydantic-settings>=2.6.0",      # Load typed config from environment / .env
+    "sqlalchemy>=2.0.36",            # ORM / DB access layer
+    "psycopg[binary]>=3.2.0",        # PostgreSQL driver used by SQLAlchemy
+    "alembic>=1.14.0",               # Database schema migrations
+    "celery[redis]>=5.4.0",          # Background job queue (evaluate / generate ADR)
+    "redis>=5.2.0",                  # Redis client (broker, results, job registry)
+    "openai>=1.55.0",                # Official OpenAI SDK for LLM providers
+    "structlog>=24.4.0",             # Structured JSON logging
+    "slowapi>=0.1.9",                # HTTP rate limiting middleware
+    "httpx>=0.28.0",                 # HTTP client (handy for API tests / calls)
+]
+
+# Optional dependency groups — not installed unless you ask for the group name.
+# "dev" is our label for local/CI tooling (tests, lint, types).
+#   pip install -e .        → only the dependencies list above
+#   pip install -e ".[dev]" → dependencies + this "dev" list
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",           # Test runner
+    "pytest-asyncio>=0.24.0",  # Run async def tests
+    "ruff>=0.8.0",             # Linter (and can format)
+    "mypy>=1.13.0",            # Static type checker
+]
+
+# How pip turns this folder into an installable Python package.
+# Hatchling = the build backend that performs that packaging step (chosen in build-backend).
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Pytest settings (lives here instead of a separate pytest.ini).
+[tool.pytest.ini_options]
+# Detect async tests automatically (no need for @pytest.mark.asyncio on every test).
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# Put src/ on the import path so tests can `import arch_decisions` without a prior install.
+pythonpath = ["src"]
+
+# Ruff = linter (catches style issues, unused imports, likely bugs).
+[tool.ruff]
+# Soft max characters per line. PEP 8 suggests 79; many teams use 88 (Black) or 100.
+# 100 is a readable compromise for this codebase.
+line-length = 100
+target-version = "py312"
+src = ["src", "tests", "scripts"]
+
+# Which rule families Ruff enables (each letter is a group of checks):
+#   E  — style / formatting issues (pycodestyle)
+#   F  — logical mistakes like unused imports (pyflakes)
+#   I  — import order
+#   UP — prefer modern Python syntax (pyupgrade)
+#   B  — common bug patterns (bugbear)
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+# E501 = "line too long" (over line-length above).
+# Ignore it only where long strings are intentional (demo seed ADRs, LLM prompts).
+[tool.ruff.lint.per-file-ignores]
+"src/arch_decisions/infrastructure/storage/seed/architecture_decision_seeds.py" = ["E501"]
+"src/arch_decisions/infrastructure/openai/*.py" = ["E501"]
+"scripts/*" = ["E501"]
+
+# mypy checks types before runtime (e.g. wrong argument types).
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+packages = ["arch_decisions"]
+
+# Some libraries ship without full type information ("stubs").
+# Without this override, mypy errors on `import celery` / `import slowapi`
+# even when our own code is fine. This says: skip type-checking those packages' APIs.
+[[tool.mypy.overrides]]
+module = ["celery.*", "slowapi.*"]
+ignore_missing_imports = true

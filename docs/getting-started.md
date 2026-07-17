@@ -13,13 +13,20 @@ Uses `docker-compose.yml` + `docker-compose.dev.yml` (hot reload for frontend an
 | Service | URL |
 |---------|-----|
 | Frontend | http://localhost:5174 |
-| API | http://localhost:3001 |
+| Express API | http://localhost:3001 |
+| Python API | http://localhost:3002 |
 
 ```bash
 make docker-down
 ```
 
-Copy `backend/.env.example` to `backend/.env` before first run if the file is missing.
+Copy env templates before first run if missing:
+
+- root `.env.example` → `.env` (`REDIS_URL`, `POSTGRES_PASSWORD`, … used by Compose)
+- `backend/.env.example` → `backend/.env`
+- `backend-python/.env.example` → `backend-python/.env`
+
+Point the frontend at Python by setting `VITE_API_URL=http://localhost:3002` (Compose frontend service env or `frontend/.env`).
 
 ---
 
@@ -60,6 +67,7 @@ Inside running containers:
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T frontend npm run test
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run test
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend-python pytest
 ```
 
 ---
@@ -70,13 +78,19 @@ Confirms backend mock/template/openai paths and fail-loud rules (live OpenAI whe
 
 ```bash
 docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run verify:providers
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend-python python scripts/verify_provider_matrix.py
 ```
 
 Matrix explained in [architecture.md](./architecture.md#provider-configuration).
 
 ---
 
-## Migrations (SQLite)
+## Migrations
+
+**Express (SQLite):** see commands below.  
+**Python (PostgreSQL):** Alembic runs on `backend-python` container start (`alembic upgrade head`).
+
+### Express (SQLite)
 
 Run automatically on API container start. Manual:
 

@@ -5,27 +5,29 @@
 ```text
 Browser
   → React (gateways)
-  → Express API
-  → Redis / BullMQ (evaluate + generate jobs)
-  → Worker
-  → Providers (mock | OpenAI) + SQLite | memory
+  → Express API  OR  FastAPI (Python)
+  → Redis queue (BullMQ / Celery)
+  → Worker process
+  → Providers (mock | OpenAI) + SQLite|memory  /  PostgreSQL|memory
 ```
 
 Evaluate and generate return **202 + jobId**; the client polls `GET /api/jobs/:jobId` until completed.
+
+Both backends expose the **same HTTP contract** so the frontend can switch via `VITE_API_URL` (`:3001` Express, `:3002` Python).
 
 ---
 
 ## Key decisions
 
-| Area | Choice | Why |
-|------|--------|-----|
-| Runtime | Node 24 Active LTS | Supported LTS without chasing Current |
-| API | Express 5 | Thin HTTP layer; service patterns stay visible |
-| Persistence | SQLite + Knex | File DB, migrations, no extra server for a portfolio |
-| Async work | BullMQ + Redis | API stays responsive; OpenAI runs off-request |
-| Frontend | React 19, feature folders | Flow-based structure scales past one screen |
-| State | TanStack Query + local/session | No Redux for three small flows |
-| AI | Optional, explicit env | Template/mock defaults; OpenAI is opt-in |
+| Area | Express | Python | Why |
+|------|---------|--------|-----|
+| Runtime | Node 24 | Python 3.12 | Parallel senior stacks in one portfolio |
+| API | Express 5 | FastAPI | Thin HTTP; typed routes + Pydantic |
+| Persistence | SQLite + Knex | PostgreSQL + SQLAlchemy/Alembic | File DB vs classical relational server |
+| Async work | BullMQ + Redis | Celery + Redis | API stays responsive; LLM off-request |
+| DI | Awilix | composition root + `Depends` | Explicit wiring without magic |
+| Frontend | React 19, feature folders | same | Shared UI against either API |
+| AI | Optional, explicit env | same | Template/mock defaults; OpenAI opt-in |
 
 ---
 
@@ -38,7 +40,7 @@ Implementations are selected by **environment variables**. Invalid values throw.
 | Frontend I/O | `VITE_DATA_SOURCE` | `http` \| `local` | `http` |
 | Recommendations | `RECOMMENDATION_PROVIDER` | `mock` \| `openai` | `mock` |
 | ADR generator | `ARCHITECTURE_DECISION_GENERATOR_PROVIDER` | `template` \| `openai` | `template` |
-| Storage | `STORAGE_PROVIDER` | `sqlite` \| `memory` | `sqlite` |
+| Storage | `STORAGE_PROVIDER` | Express: `sqlite` \| `memory` · Python: `postgres` \| `memory` | sqlite / postgres |
 
 ### Frontend (`VITE_DATA_SOURCE`)
 
@@ -61,9 +63,11 @@ When FE is `local`, backend provider env vars are unused for that session.
 | D–F | http | openai mixes | openai mixes | sqlite | Needs API key |
 | G–H | http | openai without key | — | — | Must throw at startup |
 
-Verify: `npm run verify:providers` (see [getting-started.md](./getting-started.md)).
+Verify: `npm run verify:providers` (Express) or `python scripts/verify_provider_matrix.py` (Python) — see [getting-started.md](./getting-started.md).
 
-**Code map:** [dataSource.ts](../frontend/src/shared/config/dataSource.ts) · [recommendation-provider.config.ts](../backend/src/config/recommendation-provider.config.ts) · [recommendation-provider.factory.ts](../backend/src/integrations/openai/recommendation-provider.factory.ts) · [architecture-decision-provider.factory.ts](../backend/src/integrations/openai/architecture-decision-provider.factory.ts) · [architecture-decision-repository.factory.ts](../backend/src/integrations/storage/architecture-decision-repository.factory.ts)
+**Code map (Express):** [dataSource.ts](../frontend/src/shared/config/dataSource.ts) · [recommendation-provider.config.ts](../backend/src/config/recommendation-provider.config.ts) · [recommendation-provider.factory.ts](../backend/src/integrations/openai/recommendation-provider.factory.ts) · [architecture-decision-provider.factory.ts](../backend/src/integrations/openai/architecture-decision-provider.factory.ts) · [architecture-decision-repository.factory.ts](../backend/src/integrations/storage/architecture-decision-repository.factory.ts)
+
+**Code map (Python):** [recommendation_provider_factory.py](../backend-python/src/arch_decisions/infrastructure/openai/recommendation_provider_factory.py) · [architecture_decision_provider_factory.py](../backend-python/src/arch_decisions/infrastructure/openai/architecture_decision_provider_factory.py) · [architecture_decision_repository_factory.py](../backend-python/src/arch_decisions/infrastructure/storage/architecture_decision_repository_factory.py)
 
 ---
 
@@ -77,25 +81,29 @@ arch-decisions/
 │   ├── features/      # context | recommendations | architecture-decisions
 │   ├── domain/        # Shared types and pure rules
 │   └── shared/        # API client, config, UI primitives
-├── backend/src/
-│   ├── routes/        # HTTP wiring
-│   ├── controllers/   # Request/response adapters
-│   ├── services/      # Business use cases
-│   ├── integrations/  # OpenAI, SQLite, queue
-│   ├── jobs/          # BullMQ worker + processors
-│   └── domain/        # Types and pure calculators
-└── docs/              # This documentation set
+├── backend/src/                 # Express
+│   ├── routes/ controllers/ services/ integrations/ jobs/ domain/
+├── backend-python/src/arch_decisions/   # FastAPI (src layout)
+│   ├── api/           # routes, deps, middleware
+│   ├── core/          # config, logging, errors
+│   ├── domain/        # pure business types
+│   ├── services/      # use cases
+│   ├── infrastructure/# db, openai, queue, storage
+│   └── workers/       # Celery tasks
+└── docs/
 ```
 
-**Backend flow:** `routes` → `controllers` → `services` → `integrations`  
+**Express flow:** `routes` → `controllers` → `services` → `integrations`  
+**Python flow:** `api/routes` → `services` → `infrastructure`  
 **Frontend flow:** `pages` → feature hooks → gateways → API or local adapters
 
 ---
 
 ## Production-oriented details
 
-- **API hardening:** Helmet, JSON body limit, rate limit on `/api`, correlation ID (`x-request-id`), central error handler  
-- **SQLite:** WAL + `busy_timeout` when API and worker share the DB file  
-- **Worker:** `npm run worker:dev` (watch) / `worker:prod` (built); migrations run on API only (`SKIP_DB_MIGRATIONS=1` on worker)
+- **API hardening:** Helmet / security headers, JSON body limit, rate limit on `/api`, correlation ID (`x-request-id`), central error handler  
+- **Express SQLite:** WAL + `busy_timeout` when API and worker share the DB file  
+- **Python PostgreSQL:** Alembic migrations on API boot; worker sets `SKIP_DB_MIGRATIONS=1`  
+- **Workers:** Express BullMQ / Python Celery; evaluate + generate off the request
 
 Full env list: [reference.md](./reference.md).

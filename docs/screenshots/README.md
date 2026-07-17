@@ -10,5 +10,8 @@ Desktop showcase captures (1440×900 viewport, Playwright) for README and journe
 | [04-documents-grid.png](./04-documents-grid.png) | Documents table + pagination | `/architecture-decisions` |
 | [05-adr-summary.png](./05-adr-summary.png) | ADR summary view | `/architecture-decisions/:id` |
 | [06-adr-full.png](./06-adr-full.png) | ADR full markdown document | `/architecture-decisions/:id` |
+| [07-swagger-express.png](./07-swagger-express.png) | Swagger UI — Express API | `http://localhost:3001/api-docs` |
+| [08-swagger-python.png](./08-swagger-python.png) | Swagger UI — Python API | `http://localhost:3002/docs` |
 
-Regenerate after major UI changes with Playwright against the local Vite app (`http://localhost:5174`).
+Regenerate UI shots after major frontend changes against Vite (`http://localhost:5174`).  
+Regenerate Swagger shots against the running APIs after OpenAPI schema/route changes (Express: `backend/src/openapi/`, Python: `backend-python/.../api/schemas` + routes).
