@@ -1,0 +1,66 @@
+---
+description: One business domain per source/test module — no mixed-domain grab-bags
+alwaysApply: true
+---
+
+# One domain per module
+
+Do **not** park unrelated business domains in the same file. Prefer **findability**: open one folder/file and see one concept.
+
+## What counts as a domain (this repo)
+
+Examples of separate domains:
+
+- project context
+- recommendations / evaluate
+- architecture decisions / ADR generate-list-get
+- jobs / job status
+- health
+- OpenAPI/swagger wiring
+- storage / providers (each provider family)
+
+Shared “plumbing” is allowed in one place: `conftest.py`, DI `container`, error base types, logging helpers.
+
+## Rules
+
+1. **Fixtures / test builders** — one domain per file  
+   - Good: `tests/fixtures/project_context.py`, `tests/fixtures/recommendations.py`  
+   - Bad: one `project_context.py` that also builds recommendations and ADRs
+
+2. **Unit / API tests** — group by domain folder (or one focused file)  
+   - Good: `tests/unit/recommendations/…`, `tests/api/architecture_decisions/…`  
+   - Bad: `test_services.py` that tests evaluate **and** generate **and** jobs
+
+3. **API schemas** — one domain per module (already the pattern)  
+   - Good: `api/schemas/recommendations.py`, `api/schemas/job.py`  
+   - Bad: a single `schemas.py` with every model
+
+4. **Routes / OpenAPI docs** — keep endpoint narrative next to that domain  
+   - Prefer domain folders (`routes/architecture_decisions/…`) over a flat bag of `*_docs.py` for every domain in one directory when the set grows
+   - Express already uses `routes/<domain>/*.route.ts` + `*.openapi.ts` — mirror that intent in Python
+
+5. **Barrel / index files** may re-export multiple domains — that is OK  
+   - `schemas/__init__.py` / `openapi/schemas/index.ts` are aggregation only, not the place to *define* mixed domain logic
+
+## Sanity check before finishing
+
+- If two teammates would search different folder names for the symbols in this file, **split the file**.
+- If a filename names one domain (`project_context`) but exports another (`make_recommendations_response`), **move the other export**.
+
+## Examples
+
+```python
+# ❌ Mixed domains in one fixture module
+def make_project_context(...): ...
+def make_recommendations_response(...): ...
+def make_architecture_decision(...): ...
+```
+
+```python
+# ✅ One domain per module
+# tests/fixtures/project_context.py
+def make_project_context(...): ...
+
+# tests/fixtures/recommendations.py
+def make_recommendations_response(...): ...
+```
