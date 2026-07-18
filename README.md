@@ -73,6 +73,8 @@ Details (env vars, tests, frontend-only mode): [docs/getting-started.md](./docs/
 | [docs/practices.md](./docs/practices.md) | **Must-have checklists + practice → code proof** (FE / BE / DevOps) |
 | [docs/for-reviewers.md](./docs/for-reviewers.md) | 5-minute review path and competency map |
 | [docs/examples/flows/full-journey.md](./docs/examples/flows/full-journey.md) | End-to-end walkthrough with sample payloads |
+| [backend/README.md](./backend/README.md) | Express package: URLs, scripts, layout |
+| [backend-python/README.md](./backend-python/README.md) | Python package: URLs, commands, layout |
 
 ---
 
@@ -84,7 +86,7 @@ Full evidence list with file links: **[docs/practices.md](./docs/practices.md)**
 - **Layered backend + BullMQ** — controllers → services → integrations; async jobs off the request  
 - **Feature-based frontend** — correct state ownership; gateways swap data source without UI changes  
 - **Code-first OpenAPI + Swagger** — Zod schemas (Express `/api-docs`) and Pydantic schemas (Python `/docs`); see [reference.md](./docs/reference.md#swagger-screenshots)  
-- **Tests** — 122 frontend + 40 Express backend + 18 Python backend; provider matrix smoke scripts; HTTP API integration tests on both backends  
+- **Tests** — 122 frontend + 47 Express backend + 26 Python backend; provider matrix smoke scripts; HTTP API integration tests on both backends  
 
 ---
 
