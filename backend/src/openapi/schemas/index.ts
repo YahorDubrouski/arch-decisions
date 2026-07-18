@@ -5,7 +5,8 @@ export {
     ArchitectureDecisionSchema,
     GenerateArchitectureDecisionRequestSchema,
 } from './architecture-decision.schema.js';
-export {ErrorResponseSchema, HealthResponseSchema} from './common.schema.js';
+export {ErrorResponseSchema} from './error.schema.js';
+export {HealthResponseSchema} from './health.schema.js';
 export {
     ArchitectureJobStatusViewSchema,
     JobAcceptedSchema,
