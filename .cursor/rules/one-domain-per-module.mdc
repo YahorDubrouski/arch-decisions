@@ -39,8 +39,12 @@ Shared “plumbing” is allowed in one place: `conftest.py`, DI `container`, er
    - Prefer domain folders (`routes/architecture_decisions/…`) over a flat bag of `*_docs.py` for every domain in one directory when the set grows
    - Express already uses `routes/<domain>/*.route.ts` + `*.openapi.ts` — mirror that intent in Python
 
-5. **Barrel / index files** may re-export multiple domains — that is OK  
-   - `schemas/__init__.py` / `openapi/schemas/index.ts` are aggregation only, not the place to *define* mixed domain logic
+5. **Configuration** — one concern per config module (like Express `config/*.config.ts`)  
+   - Good: `core/config/openai.py`, `core/config/redis.py`, `core/config/storage.py`  
+   - Bad: one mega-`Settings` class defining OpenAI + Redis + storage + every provider switch
+
+6. **Barrel / index files** may re-export multiple domains — that is OK  
+   - `schemas/__init__.py` / `openapi/schemas/index.ts` / `core/config/__init__.py` are aggregation only, not the place to *define* mixed domain logic
 
 ## Sanity check before finishing
 
