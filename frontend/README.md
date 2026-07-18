@@ -81,7 +81,7 @@ src/
 
 Deploy the Vite `dist/` folder as Workers static assets (no Express/Python).
 
-1. **Repo** — `wrangler.toml` points `[assets]` at `./dist` with SPA `not_found_handling`. `public/_redirects` covers classic Pages-style fallbacks.
+1. **Repo** — `wrangler.toml` points `[assets]` at `./dist` with SPA `not_found_handling` (deep links → `index.html`). Do **not** add a Pages-style `public/_redirects` SPA rule — Workers rejects it as an infinite loop.
 2. **Dashboard** (Workers & Pages → this project → Settings → Build):
 
 | Field | Value |
