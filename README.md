@@ -73,8 +73,16 @@ Details (env vars, tests, frontend-only mode): [docs/getting-started.md](./docs/
 | [docs/practices.md](./docs/practices.md) | **Must-have checklists + practice → code proof** (FE / BE / DevOps) |
 | [docs/for-reviewers.md](./docs/for-reviewers.md) | 5-minute review path and competency map |
 | [docs/examples/flows/full-journey.md](./docs/examples/flows/full-journey.md) | End-to-end walkthrough with sample payloads |
-| [backend/README.md](./backend/README.md) | Express package: URLs, scripts, layout |
-| [backend-python/README.md](./backend-python/README.md) | Python package: URLs, commands, layout |
+
+### Standalone backend packages
+
+Each backend has its **own** README + docs set (architecture, practices, Swagger screenshots, reviewer path):
+
+| Package | Landing | Docs index |
+|---------|---------|------------|
+| Express (Node) | [backend/README.md](./backend/README.md) | [backend/docs/](./backend/docs/) |
+| FastAPI (Python) | [backend-python/README.md](./backend-python/README.md) | [backend-python/docs/](./backend-python/docs/) |
+
 
 ---
 

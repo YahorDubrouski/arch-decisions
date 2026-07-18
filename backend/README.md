@@ -1,14 +1,41 @@
 # Architecture Decisions — Express backend
 
-Node/Express implementation of the Architecture Decisions API: recommendations + ADR generation via `202` + job polling, provider matrix, BullMQ worker, SQLite (or in-memory) persistence.
+Node/Express API that turns project context into infrastructure recommendations and Architecture Decision Records (ADRs).
 
-Point the frontend here with `VITE_API_URL=http://localhost:3001` (Compose default).
+**Audience:** hiring managers and engineers reviewing a **senior Node backend** — layered services, BullMQ jobs, Zod/OpenAPI, fail-loud providers.
+
+Same HTTP contract as the [Python twin](../backend-python/README.md) (`202` + job polling).
+
+---
+
+## What you get
+
+1. **Evaluate recommendations** — `POST /api/recommendations/evaluate` → **202** + poll job  
+2. **Generate ADRs** — `POST /api/architecture-decisions/generate` → **202** + persist  
+3. **List / get decisions** — search + status filters  
+4. **Swagger** — code-first OpenAPI at `/api-docs`
+
+Stack: Node 24 · Express 5 · TypeScript · Zod + zod-to-openapi · BullMQ + Redis · SQLite (Knex) or memory · Winston · Jest · optional OpenAI.
+
+---
+
+## Screenshots
+
+| Swagger | Recommendations (companion UI) |
+|---------|--------------------------------|
+| ![Swagger](./docs/screenshots/07-swagger-express.png) | ![Recommendations](./docs/screenshots/03-recommendations.png) |
+
+| Documents | ADR full |
+|-----------|----------|
+| ![Documents](./docs/screenshots/04-documents-grid.png) | ![ADR](./docs/screenshots/06-adr-full.png) |
+
+More: [docs/screenshots/](./docs/screenshots/).
 
 ---
 
 ## Quick start (Docker)
 
-From the **repo root**:
+From the **monorepo root**:
 
 ```bash
 make docker-up
@@ -18,31 +45,36 @@ make docker-up
 |---------|-----|
 | Express API | http://localhost:3001 |
 | Health | http://localhost:3001/health |
-| Swagger UI | http://localhost:3001/api-docs |
+| **Swagger UI** | http://localhost:3001/api-docs |
 | OpenAPI JSON | http://localhost:3001/openapi.json |
 
-Python twin is on http://localhost:3002 — see [../backend-python/README.md](../backend-python/README.md).
+Stop: `make docker-down`
 
-Copy env if needed: `.env.example` → `.env` (Compose may override `REDIS_URL` from the root `.env`).
+Details: [docs/getting-started.md](./docs/getting-started.md)
 
 ---
 
-## Commands (inside the container)
+## Documentation
 
-```bash
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run test
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run lint
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run verify:providers
-docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec -T backend npm run migrate
-```
+| Document | Purpose |
+|----------|---------|
+| [docs/getting-started.md](./docs/getting-started.md) | Run, test, verify providers |
+| [docs/architecture.md](./docs/architecture.md) | Decisions, providers, layout |
+| [docs/reference.md](./docs/reference.md) | API, env, scripts |
+| [docs/practices.md](./docs/practices.md) | **Must-have checklist + code proof** |
+| [docs/for-reviewers.md](./docs/for-reviewers.md) | 5-minute review path |
+| [docs/screenshots/](./docs/screenshots/) | Swagger + companion UI |
 
-| Script | Purpose |
-|--------|---------|
-| `npm run dev` | API with tsx watch |
-| `npm run worker:dev` | BullMQ worker with watch |
-| `npm run test` | Jest unit + HTTP integration tests |
-| `npm run verify:providers` | Provider smoke (mock/template/openai) |
-| `npm run migrate` | Knex migrations (also on API boot) |
+---
+
+## Highlights
+
+- **Explicit provider selection** — mock/OpenAI, template/OpenAI, sqlite/memory; misconfig throws  
+- **Layered backend + BullMQ** — controllers → services → integrations; async off the request  
+- **Code-first OpenAPI** — Zod schemas + sibling `*.openapi.ts`  
+- **Tests** — ~47 Jest tests (unit + Supertest HTTP)
+
+Full evidence: [docs/practices.md](./docs/practices.md).
 
 ---
 
@@ -65,18 +97,6 @@ Flow: `routes` → `controllers` → `services` → `integrations`.
 
 ---
 
-## Documentation
+## License
 
-| Document | Purpose |
-|----------|---------|
-| [../docs/getting-started.md](../docs/getting-started.md) | Run, test, env setup |
-| [../docs/architecture.md](../docs/architecture.md) | Providers, layout, workers |
-| [../docs/reference.md](../docs/reference.md) | API + env vars + scripts |
-| [../docs/practices.md](../docs/practices.md) | Senior Express checklist with file proof |
-| [../README.md](../README.md) | Product overview + screenshots |
-
----
-
-## Stack
-
-Node 24 · Express 5 · TypeScript · Zod + zod-to-openapi · BullMQ + Redis · better-sqlite3 + Knex · Winston · Jest · Supertest
+Portfolio / demonstration package (part of the arch-decisions monorepo).

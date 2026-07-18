@@ -9,7 +9,9 @@ A short path to evaluate this portfolio without reading the whole repo.
 1. **Read** [README.md](../README.md) (overview + screenshots)  
 2. **Run** `make docker-up` → open http://localhost:5174  
 3. **Walk** Context → Recommendations → Generate ADR → Documents → open ADR (summary + full)  
-4. **Backend API (optional):** open Swagger — [Express](http://localhost:3001/api-docs) or [Python](http://localhost:3002/docs) (screenshots in [reference.md](./reference.md#swagger-screenshots))  
+4. **Backend API (optional):** open Swagger — [Express](http://localhost:3001/api-docs) or [Python](http://localhost:3002/docs)  
+   - Package docs: [backend/docs/](../backend/docs/) · [backend-python/docs/](../backend-python/docs/)
+
 5. **Skim** [architecture.md](./architecture.md) (decisions + provider model)  
 6. **Open** [practices.md](./practices.md) — **must-have checklists with proof links**, then the full practice map  
 7. **Deep-dive code** (pick one track):
