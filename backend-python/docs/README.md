@@ -13,4 +13,4 @@ Standalone docs for the **Python / FastAPI** Architecture Decisions API.
 
 **Suggested order:** [for-reviewers.md](./for-reviewers.md) → Swagger → [practices.md](./practices.md) → [architecture.md](./architecture.md).
 
-This package lives in the [arch-decisions](../../README.md) monorepo (React UI + optional Express twin). Docs here are written so reviewers can treat **FastAPI as its own backend project**.
+This package lives in the [arch-decisions](../../README.md) monorepo ([React UI](../../frontend/README.md) + optional [Express twin](../../backend/README.md)). Docs here are written so reviewers can treat **FastAPI as its own backend project**.

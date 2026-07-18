@@ -66,20 +66,22 @@ Details (env vars, tests, frontend-only mode): [docs/getting-started.md](./docs/
 
 | Document | Purpose |
 |----------|---------|
+| [docs/README.md](./docs/README.md) | Docs index |
 | [docs/getting-started.md](./docs/getting-started.md) | Run, test, verify provider matrix |
 | [docs/architecture.md](./docs/architecture.md) | Key decisions, provider config, repo layout |
 | [docs/reference.md](./docs/reference.md) | API endpoints, Swagger, environment variables |
 | [docs/frontend.md](./docs/frontend.md) | React structure for frontend reviewers |
 | [docs/practices.md](./docs/practices.md) | **Must-have checklists + practice → code proof** (FE / BE / DevOps) |
 | [docs/for-reviewers.md](./docs/for-reviewers.md) | 5-minute review path and competency map |
+| [docs/examples/](./docs/examples/) | Scenarios, sample ADRs, full journey |
 | [docs/examples/flows/full-journey.md](./docs/examples/flows/full-journey.md) | End-to-end walkthrough with sample payloads |
+| [docs/screenshots/](./docs/screenshots/) | UI + Swagger captures |
 
-### Standalone backend packages
-
-Each backend has its **own** README + docs set (architecture, practices, Swagger screenshots, reviewer path):
+### Packages (each has its own README + docs)
 
 | Package | Landing | Docs index |
 |---------|---------|------------|
+| Frontend (React) | [frontend/README.md](./frontend/README.md) | [docs/frontend.md](./docs/frontend.md) (shared) |
 | Express (Node) | [backend/README.md](./backend/README.md) | [backend/docs/](./backend/docs/) |
 | FastAPI (Python) | [backend-python/README.md](./backend-python/README.md) | [backend-python/docs/](./backend-python/docs/) |
 

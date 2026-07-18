@@ -13,12 +13,11 @@ Monorepo product docs (UI + both backends).
 | [examples/](./examples/) | Sample JSON contexts and ADR markdown |
 | [screenshots/](./screenshots/) | UI capture catalog |
 
-### Standalone backend docs
+### Packages
 
-Reviewers who care about **one** stack can start here:
-
-| Backend | Landing | Docs |
+| Package | Landing | Docs |
 |---------|---------|------|
+| Frontend | [../frontend/README.md](../frontend/README.md) | [frontend.md](./frontend.md) |
 | Express | [../backend/README.md](../backend/README.md) | [../backend/docs/](../backend/docs/) |
 | Python | [../backend-python/README.md](../backend-python/README.md) | [../backend-python/docs/](../backend-python/docs/) |
 

@@ -13,4 +13,4 @@ Standalone docs for the **Node / Express** Architecture Decisions API.
 
 **Suggested order:** [for-reviewers.md](./for-reviewers.md) → Swagger → [practices.md](./practices.md) → [architecture.md](./architecture.md).
 
-This package lives in the [arch-decisions](../../README.md) monorepo (React UI + optional Python twin). Docs here are written so reviewers can treat **Express as its own backend project**.
+This package lives in the [arch-decisions](../../README.md) monorepo ([React UI](../../frontend/README.md) + optional [Python twin](../../backend-python/README.md)). Docs here are written so reviewers can treat **Express as its own backend project**.

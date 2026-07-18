@@ -60,12 +60,16 @@ Details: [docs/getting-started.md](./docs/getting-started.md)
 
 | Document | Purpose |
 |----------|---------|
+| [docs/README.md](./docs/README.md) | Docs index |
 | [docs/getting-started.md](./docs/getting-started.md) | Run, test, verify providers |
 | [docs/architecture.md](./docs/architecture.md) | Decisions, providers, layout |
 | [docs/reference.md](./docs/reference.md) | API, env, commands |
 | [docs/practices.md](./docs/practices.md) | **Must-have checklist + code proof** |
 | [docs/for-reviewers.md](./docs/for-reviewers.md) | 5-minute review path |
 | [docs/screenshots/](./docs/screenshots/) | Swagger + companion UI |
+| [../README.md](../README.md) | Monorepo landing |
+| [../backend/README.md](../backend/README.md) | Express twin |
+| [../frontend/README.md](../frontend/README.md) | Companion React app |
 
 ---
 
