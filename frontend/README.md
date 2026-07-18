@@ -77,6 +77,27 @@ src/
 
 ---
 
+## Cloudflare Workers (static SPA)
+
+Deploy the Vite `dist/` folder as Workers static assets (no Express/Python).
+
+1. **Repo** — `wrangler.toml` points `[assets]` at `./dist` with SPA `not_found_handling`. `public/_redirects` covers classic Pages-style fallbacks.
+2. **Dashboard** (Workers & Pages → this project → Settings → Build):
+
+| Field | Value |
+|-------|--------|
+| Path | `/frontend/` |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+
+Do **not** use `npx wrangler pages deploy` on a Workers project (dashboard may reject with “Invalid request body”).
+
+3. **Environment variables** (Build / production): set `VITE_DATA_SOURCE=local`. Omit `VITE_API_URL`.
+
+After merging these files to `main`, re-run the failed build (or push a commit).
+
+---
+
 ## License
 
 Portfolio / demonstration package (part of the arch-decisions monorepo).
