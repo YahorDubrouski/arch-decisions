@@ -2,6 +2,8 @@
 
 A portfolio application that turns project context (team size, budget, compliance, traffic) into infrastructure recommendations and Architecture Decision Records (ADRs).
 
+**Live demo:** [https://arch-decisions.yahordubrouski.com/](https://arch-decisions.yahordubrouski.com/) — React SPA on Cloudflare Workers (`VITE_DATA_SOURCE=local`, no backend).
+
 **Audience:** architects, senior engineers, and hiring managers evaluating system design — not a production SaaS product.
 
 ---

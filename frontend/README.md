@@ -6,6 +6,8 @@ React app for the context wizard, recommendations, and ADR documents.
 
 Works with the [Express](../backend/README.md) or [Python](../backend-python/README.md) API, or **standalone** with `VITE_DATA_SOURCE=local` (sessionStorage + in-browser rules/templates — no backend).
 
+**Live demo:** [https://arch-decisions.yahordubrouski.com/](https://arch-decisions.yahordubrouski.com/) (Cloudflare Workers, local data source).
+
 ---
 
 ## What you get
@@ -78,6 +80,8 @@ src/
 ---
 
 ## Cloudflare Workers (static SPA)
+
+**Production:** [https://arch-decisions.yahordubrouski.com/](https://arch-decisions.yahordubrouski.com/)
 
 Deploy the Vite `dist/` folder as Workers static assets (no Express/Python).
 
