@@ -1,4 +1,9 @@
-"""HTTP integration — POST /api/recommendations/evaluate."""
+"""HTTP integration — POST /api/recommendations/evaluate.
+
+Business rules under test:
+- Valid project context is accepted and returns a job id.
+- Invalid project context is rejected before evaluation is enqueued.
+"""
 
 from __future__ import annotations
 

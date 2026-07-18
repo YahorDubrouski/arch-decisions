@@ -1,4 +1,9 @@
-"""HTTP integration — GET /api/architecture-decisions."""
+"""HTTP integration — GET /api/architecture-decisions.
+
+Business rules under test:
+- Demo architecture decisions are available to list.
+- Search narrows the list to matching titles/summaries.
+"""
 
 from __future__ import annotations
 

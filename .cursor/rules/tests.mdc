@@ -8,7 +8,10 @@ alwaysApply: false
 
 ## Test structure — Arrange / Act / Assert
 
-Every test must have `// Arrange`, `// Act`, `// Assert` comments. Keep them in that order (`expect(...).toThrow` / `rejects` setup goes before Act when needed).
+Every test must have Arrange / Act / Assert comments. Keep them in that order (`expect(...).toThrow` / `pytest.raises` / `rejects` setup goes before Act when needed).
+
+- TypeScript / Jest: `// Arrange`, `// Act`, `// Assert`
+- Python / pytest: `# Arrange`, `# Act`, `# Assert`
 
 ```ts
 it('returns EC2 for small cost-optimized teams', async () => {
@@ -24,6 +27,18 @@ it('returns EC2 for small cost-optimized teams', async () => {
   // Assert
   expect(result.compute.recommended).toBe('EC2');
 });
+```
+
+```python
+def test_when_team_is_small_and_cost_optimized_then_recommend_ec2() -> None:
+    # Arrange
+    context = make_project_context(teamSize="1-5", budgetSensitivity="cost-optimized")
+
+    # Act
+    result = await provider.evaluate_all(context)
+
+    # Assert
+    assert result.compute.recommended == "EC2"
 ```
 
 ## Business logic as documentation
@@ -60,5 +75,5 @@ it('calls evaluateAll and checks compute.recommended', async () => {});
 ## Test naming from docblock
 
 - Derive test names from `When` + `Then` in the method docblock when both exist.
-- Prefer pattern: `when_<condition>_then_<business_outcome>` (Jest/Vitest `it(...)` string).
+- Prefer pattern: `when_<condition>_then_<business_outcome>` (Jest/Vitest `it(...)` string, or pytest `test_when_…_then_…`).
 - Keep names concise, behavior-focused, and readable by non-technical stakeholders.

@@ -1,4 +1,9 @@
-"""HTTP integration — GET /api/architecture-decisions/{decision_id}."""
+"""HTTP integration — GET /api/architecture-decisions/{decision_id}.
+
+Business rules under test:
+- Demo architecture decisions are available to open by id.
+- Unknown decision ids are reported as not found.
+"""
 
 from __future__ import annotations
 

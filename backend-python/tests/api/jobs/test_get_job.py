@@ -1,4 +1,9 @@
-"""HTTP integration — GET /api/jobs/{job_id}."""
+"""HTTP integration — GET /api/jobs/{job_id}.
+
+Business rules under test:
+- A newly enqueued job can be polled by id.
+- Unknown job ids are reported as not found.
+"""
 
 from __future__ import annotations
 
@@ -23,13 +28,13 @@ def test_when_client_polls_an_enqueued_job_then_return_job_status(
         "/api/recommendations/evaluate",
         json={"context": make_project_context().model_dump()},
     )
+    assert enqueue_response.status_code == 202
     job_id = enqueue_response.json()["jobId"]
 
     # Act
     response = client.get(f"/api/jobs/{job_id}")
 
     # Assert
-    assert enqueue_response.status_code == 202
     assert response.status_code == 200
     job = response.json()["job"]
     assert job["jobId"] == job_id

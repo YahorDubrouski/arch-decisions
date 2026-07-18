@@ -1,4 +1,8 @@
-"""HTTP integration — GET /health."""
+"""HTTP integration — GET /health.
+
+Business rules under test:
+- The API exposes a health check for liveness.
+"""
 
 from __future__ import annotations
 

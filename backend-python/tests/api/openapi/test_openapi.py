@@ -1,4 +1,8 @@
-"""HTTP integration — GET /openapi.json."""
+"""HTTP integration — GET /openapi.json.
+
+Business rules under test:
+- OpenAPI documents the public HTTP contract clients rely on.
+"""
 
 from __future__ import annotations
 

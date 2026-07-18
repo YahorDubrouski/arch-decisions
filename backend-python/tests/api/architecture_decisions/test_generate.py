@@ -1,4 +1,9 @@
-"""HTTP integration — POST /api/architecture-decisions/generate."""
+"""HTTP integration — POST /api/architecture-decisions/generate.
+
+Business rules under test:
+- Valid context + recommendations are accepted and return a job id.
+- Invalid bodies are rejected before generation is enqueued.
+"""
 
 from __future__ import annotations
 
