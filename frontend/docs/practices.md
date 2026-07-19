@@ -79,7 +79,6 @@ Use after the [5-minute review path](../../docs/for-reviewers.md). Companion: [f
 | Practice | What it shows | Where to check |
 |----------|---------------|----------------|
 | Vitest + Testing Library | Behavior tests (`getByRole`, user-event), co-located `__tests__` | [ArchitectureDecisionsPage.test.tsx](../src/pages/__tests__/ArchitectureDecisionsPage.test.tsx) |
-| No Playwright E2E in this package | Browser E2E is not part of the frontend package; unit/integration cover UI states | — |
 
 ---
 
