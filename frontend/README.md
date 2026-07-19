@@ -44,11 +44,11 @@ Details: [docs/getting-started.md](../docs/getting-started.md) · [docs/frontend
 
 | Document | Purpose |
 |----------|---------|
-| [../docs/README.md](../docs/README.md) | Monorepo docs index |
+| [docs/practices.md](./docs/practices.md) | **React must-haves + code proof** |
 | [../docs/frontend.md](../docs/frontend.md) | React layout, state, gateways |
 | [../docs/getting-started.md](../docs/getting-started.md) | Run stack, frontend-only / Cloudflare notes |
 | [../docs/architecture.md](../docs/architecture.md) | Provider matrix (`VITE_DATA_SOURCE`) |
-| [../docs/practices.md](../docs/practices.md) | **React must-haves + code proof** |
+| [../docs/practices.md](../docs/practices.md) | Monorepo practices index (all packages) |
 | [../docs/for-reviewers.md](../docs/for-reviewers.md) | 5-minute review path |
 | [../docs/examples/flows/full-journey.md](../docs/examples/flows/full-journey.md) | End-to-end UI walkthrough |
 | [../docs/screenshots/](../docs/screenshots/) | UI captures |
@@ -62,7 +62,7 @@ Details: [docs/getting-started.md](../docs/getting-started.md) · [docs/frontend
 - **State ownership** — form / Query / URL / session / derived  
 - **Thin pages** — loading → error → empty → success  
 
-Full evidence: [../docs/practices.md](../docs/practices.md).
+Full evidence: [docs/practices.md](./docs/practices.md).
 
 ---
 

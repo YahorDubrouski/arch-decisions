@@ -82,7 +82,20 @@ arch-decisions/
 │   ├── domain/        # Shared types and pure rules
 │   └── shared/        # API client, config, UI primitives
 ├── backend/src/                 # Express
-│   ├── routes/ controllers/ services/ integrations/ jobs/ domain/
+│   ├── app/             # composition root (Awilix DI wiring)
+│   ├── routes/          # endpoints definition + OpenAPI documentation
+│   ├── controllers/     # controller definitions that delegate business logic to services
+│   ├── services/        # application business logic
+│   ├── integrations/    # external resource adapters (AI, database, queue)
+│   ├── jobs/            # background workers and processes
+│   ├── domain/          # pure business types and rules
+│   ├── config/          # environment settings by concern
+│   ├── openapi/         # shared OpenAPI / Zod schema pieces
+│   ├── validators/      # HTTP request validation schemas
+│   ├── middleware/      # correlation ID per request and other middleware
+│   ├── lib/             # shared helpers (HTTP, errors, logging)
+│   ├── migrations/      # Knex database schema migrations
+│   └── test/            # integration test helpers and fixtures
 ├── backend-python/src/arch_decisions/   # FastAPI (src layout)
 │   ├── api/           # routes, deps, middleware
 │   ├── core/          # config, logging, errors

@@ -57,15 +57,20 @@ Verify: `npm run verify:providers` — see [getting-started.md](./getting-starte
 
 ```text
 backend/src/
-├── routes/          # HTTP + sibling *.openapi.ts
-├── controllers/     # thin adapters
-├── services/        # use cases
-├── integrations/    # openai, storage, queue
-├── jobs/            # BullMQ worker + processors
-├── domain/          # pure types / rules
-├── config/          # env by concern
-├── openapi/         # Zod schemas by domain
-└── middleware/      # correlation, errors, security, rate limit
+├── app/             # composition root (Awilix DI wiring)
+├── routes/          # endpoints definition + OpenAPI documentation
+├── controllers/     # controller definitions that delegate business logic to services
+├── services/        # application business logic
+├── integrations/    # external resource adapters (AI, database, queue)
+├── jobs/            # background workers and processes
+├── domain/          # pure business types and rules
+├── config/          # environment settings by concern
+├── openapi/         # shared OpenAPI / Zod schema pieces
+├── validators/      # HTTP request validation schemas
+├── middleware/      # correlation ID per request and other middleware
+├── lib/             # shared helpers (HTTP, errors, logging)
+├── migrations/      # Knex database schema migrations
+└── test/            # integration test helpers and fixtures
 ```
 
 **Flow:** `routes` → `controllers` → `services` → `integrations`

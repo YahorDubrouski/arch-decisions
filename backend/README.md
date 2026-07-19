@@ -86,15 +86,20 @@ Full evidence: [docs/practices.md](./docs/practices.md).
 
 ```text
 src/
-├── routes/          # HTTP routes + sibling *.openapi.ts docs
-├── controllers/     # thin HTTP adapters
-├── services/        # use cases
-├── integrations/    # openai, storage, queue adapters
-├── jobs/            # BullMQ worker entry
-├── domain/          # pure business types
-├── config/          # env by concern
-├── openapi/         # shared Zod schemas by domain
-└── middleware/      # correlation id, errors, security, rate limit
+├── app/             # composition root (Awilix DI wiring)
+├── routes/          # endpoints definition + OpenAPI documentation
+├── controllers/     # controller definitions that delegate business logic to services
+├── services/        # application business logic
+├── integrations/    # external resource adapters (AI, database, queue)
+├── jobs/            # background workers and processes
+├── domain/          # pure business types and rules
+├── config/          # environment settings by concern
+├── openapi/         # shared OpenAPI / Zod schema pieces
+├── validators/      # HTTP request validation schemas
+├── middleware/      # correlation ID per request and other middleware
+├── lib/             # shared helpers (HTTP, errors, logging)
+├── migrations/      # Knex database schema migrations
+└── test/            # integration test helpers and fixtures
 ```
 
 Flow: `routes` → `controllers` → `services` → `integrations`.
